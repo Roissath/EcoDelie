@@ -25,6 +25,7 @@ import { Message } from './message/message.entity';
 import { Entrepot } from './entrepot/entrepot.entity';
 import { Stokage } from './stokage/stokage.entity';
 import { CommentaireProduit } from './commentaire-produit/commentaire-produit.entity';
+import { Livraison } from './livraison/livraison.entity';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -44,6 +45,7 @@ export const AppDataSource = new DataSource({
     Produit,
     Commande,
     Facture,
+    Livraison,
     Contract,
     Annonce,
     AnnonceClient,
@@ -59,6 +61,6 @@ export const AppDataSource = new DataSource({
     CommentaireProduit,
   ],
   migrations: ['src/migration/*.ts'],
-  synchronize: false,
+  synchronize: true,
   logging: true,
 });

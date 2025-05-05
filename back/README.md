@@ -6,3 +6,9 @@ migration:generate
 migration:run
 
 migration:revert
+
+
+npm run seed pour generer les donner temporer 
+
+
+npm run start:dev pour lancer 

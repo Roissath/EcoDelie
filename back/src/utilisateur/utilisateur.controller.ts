@@ -12,6 +12,7 @@ export class UtilisateurController {
     return this.service.create(dto);
   }
 
+
   @Get()
   findAll() {
     return this.service.findAll();

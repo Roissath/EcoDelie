@@ -26,6 +26,7 @@ const message_entity_1 = require("./message/message.entity");
 const entrepot_entity_1 = require("./entrepot/entrepot.entity");
 const stokage_entity_1 = require("./stokage/stokage.entity");
 const commentaire_produit_entity_1 = require("./commentaire-produit/commentaire-produit.entity");
+const livraison_entity_1 = require("./livraison/livraison.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: 'mysql',
     host: 'localhost',
@@ -44,6 +45,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         produit_entity_1.Produit,
         commande_entity_1.Commande,
         facture_entity_1.Facture,
+        livraison_entity_1.Livraison,
         contract_entity_1.Contract,
         annonce_entity_1.Annonce,
         annonce_client_entity_1.AnnonceClient,
@@ -59,7 +61,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         commentaire_produit_entity_1.CommentaireProduit,
     ],
     migrations: ['src/migration/*.ts'],
-    synchronize: false,
+    synchronize: true,
     logging: true,
 });
 //# sourceMappingURL=data-source.js.map

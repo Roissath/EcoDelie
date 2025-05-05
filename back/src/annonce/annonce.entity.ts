@@ -8,7 +8,7 @@ import {
   } from 'typeorm';
   import { Utilisateur } from '../utilisateur/utilisateur.entity';
   import { InfoPrestataire } from '../info-prestataire/info-prestataire.entity';
-  import { Paiement } from 'src/paiement/paiement.entity';
+  import { Paiement } from '../paiement/paiement.entity';
   import { Colis } from '../colis/colis.entity';
   
   @Entity()

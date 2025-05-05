@@ -1,7 +1,8 @@
 export enum Role {
-  ADMIN = 'admin',
-  CLIENT = 'client',
-  LIVREUR = 'livreur',
-  PRESTATAIRE = 'prestataire',
-  COMMERCANT = 'commercant',
-}
+    Client = 'client',
+    Livreur = 'livreur',
+    Prestataire = 'prestataire',
+    Commercant = 'commercant',
+    Admin = 'admin',
+  }
+  

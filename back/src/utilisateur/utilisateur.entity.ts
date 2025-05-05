@@ -6,28 +6,28 @@ import {
     OneToMany,
     JoinColumn
   } from 'typeorm';
-  import { Role } from 'src/enums/role.enum';
+  import { Role } from '../enums/role.enum';
   import { InfoClient } from '../info-client/info-client.entity';
-  import { InfoLivreur } from 'src/info-livreur/info-livreur.entity';
+  import { InfoLivreur } from '../info-livreur/info-livreur.entity';
   import { InfoPrestataire } from '../info-prestataire/info-prestataire.entity';
-  import { InfoCommercant } from 'src/info-commercant/info-commercant.entity';
+  import { InfoCommercant } from '../info-commercant/info-commercant.entity';
   import { Admin } from '../admin/admin.entity';
-  import { Annonce } from 'src/annonce/annonce.entity';
-  import { AnnonceClient } from 'src/annonce-client/annonce-client.entity';
+  import { Annonce } from '../annonce/annonce.entity';
+  import { AnnonceClient } from '../annonce-client/annonce-client.entity';
   import { Message } from '../message/message.entity';
-  import { Commande } from 'src/commande/commande.entity';
+  import { Commande } from '../commande/commande.entity';
   import { Paiement } from '../paiement/paiement.entity';
-  import { Facture } from 'src/facture/facture.entity';
+  import { Facture } from '../facture/facture.entity';
   import { Historique } from '../historique/historique.entity';
-  import { Abonnement } from 'src/abonnement/abonnement.entity';
+  import { Abonnement } from '../abonnement/abonnement.entity';
   import { Notification } from '../notification/notification.entity';
-  import { Contract } from 'src/contract/contract.entity';
+  import { Contract } from '../contract/contract.entity';
   import { Produit } from '../produit/produit.entity';
-  import { Livraison } from 'src/livraison/livraison.entity';
+  import { Livraison } from '../livraison/livraison.entity';
   import { Colis } from '../colis/colis.entity';
-  import { CommentaireProduit } from 'src/commentaire-produit/commentaire-produit.entity';
-  import { Disponibilite } from 'src/disponibilite/disponibilite.entity';
-  import { Document } from 'src/document/document.entity';
+  import { CommentaireProduit } from '../commentaire-produit/commentaire-produit.entity';
+  import { Disponibilite } from '../disponibilite/disponibilite.entity';
+  import { Document } from '../document/document.entity';
   
 
   @Entity()
