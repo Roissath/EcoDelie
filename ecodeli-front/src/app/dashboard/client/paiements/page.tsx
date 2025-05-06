@@ -1,17 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CreditCard } from 'lucide-react'
+import { FileDown, Eye } from 'lucide-react'
+import Link from 'next/link'
 
 interface Paiement {
   id: number
   montant: number
   date_paiement: string
-  moyen_paiement: string
   statut: string
-  facture?: {
-    pdf_url?: string
-  }
+  utilisateur: { id: number; nom: string }
+  annonce?: { id: number; titre: string }
 }
 
 export default function PaiementsClient() {
@@ -19,10 +18,10 @@ export default function PaiementsClient() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const clientId = 1 // à remplacer dynamiquement après login
-
-    fetch(`http://localhost:3001/paiements/client/${clientId}`)
-      .then(res => res.json())
+    fetch('http://localhost:3001/paiements/me', {
+      credentials: 'include',
+    })
+      .then(res => res.ok ? res.json() : [])
       .then(data => {
         setPaiements(data)
         setLoading(false)
@@ -30,43 +29,66 @@ export default function PaiementsClient() {
       .catch(() => setLoading(false))
   }, [])
 
+  const telechargerFacture = async (paiementId: number) => {
+    try {
+      const res = await fetch(`http://localhost:3001/paiements/${paiementId}/facture`, {
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Erreur lors de la génération de la facture')
+      const data = await res.json()
+      const url = `http://localhost:3001${data.file}`
+      window.open(url, '_blank')
+    } catch (err) {
+      console.error(err)
+      alert("Échec du téléchargement de la facture")
+    }
+  }
+
+  if (loading) {
+    return <div className="p-6 text-center">Chargement...</div>
+  }
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-6">
-      <h1 className="text-3xl font-bold text-[#0070C0] mb-6 flex items-center gap-2">
-        <CreditCard className="w-7 h-7 text-green-600" />
-        Paiements & Factures
-      </h1>
+      <h1 className="text-3xl font-bold text-[#0070C0] mb-6">Mes paiements</h1>
 
-      {loading ? (
-        <p className="text-gray-600">Chargement...</p>
-      ) : paiements.length === 0 ? (
-        <p className="text-gray-500">Aucun paiement effectué.</p>
+      {paiements.length === 0 ? (
+        <p className="text-gray-600">Aucun paiement trouvé.</p>
       ) : (
-        <ul className="space-y-6">
-          {paiements.map((p) => (
-            <li key={p.id} className="bg-white rounded-xl shadow p-4 flex justify-between items-center">
+        <div className="grid gap-6">
+          {paiements.map(p => (
+            <div key={p.id} className="bg-white shadow rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-gray-800">Paiement #{p.id}</h2>
-                <p className="text-sm text-gray-600">Date : {new Date(p.date_paiement).toLocaleDateString()}</p>
-                <p className="text-sm text-gray-600">Moyen : {p.moyen_paiement}</p>
-                <p className="text-sm text-gray-600">Statut : <span className="font-semibold">{p.statut}</span></p>
-              </div>
-              <div className="text-right">
-                <p className="text-green-700 font-bold text-xl">{p.montant.toFixed(2)} €</p>
-
-                {p.facture?.pdf_url && (
-                  <a
-                    href={p.facture.pdf_url}
-                    target="_blank"
-                    className="text-sm text-blue-700 underline mt-2 inline-block"
-                  >
-                    Voir facture
-                  </a>
+                <p className="font-semibold text-lg text-gray-800">Montant : {p.montant.toFixed(2)} €</p>
+                <p className="text-gray-500 text-sm">Statut : {p.statut}</p>
+                <p className="text-gray-500 text-sm">Date : {new Date(p.date_paiement).toLocaleDateString()}</p>
+                {p.annonce && (
+                  <p className="text-gray-500 text-sm">Annonce : {p.annonce.titre}</p>
                 )}
               </div>
-            </li>
+
+              <div className="flex gap-4 mt-4 md:mt-0">
+                {p.annonce?.id && (
+                  <Link
+                    href={`/dashboard/client/commandes/${p.annonce.id}`}
+                    className="flex items-center gap-1 text-sm text-[#0070C0] hover:underline"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Voir commande
+                  </Link>
+                )}
+
+                <button
+                  onClick={() => telechargerFacture(p.id)}
+                  className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-700"
+                >
+                  <FileDown className="w-4 h-4" />
+                  Télécharger facture
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )

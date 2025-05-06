@@ -1,68 +1,87 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { ShoppingCart } from 'lucide-react'
 
 interface Produit {
-  id: string
+  id: number
   nom: string
   prix: number
-  imageUrl: string
-  commercantNom: string
+  quantite: number
+  imageUrl?: string
 }
 
-export default function ExplorerProduits() {
-  const [produits, setProduits] = useState<Produit[]>([])
+interface Commande {
+  id: number
+  date: string
+  statut: string
+  total: number
+  produits: Produit[]
+}
+
+export default function CommandeDetailClient() {
+  const { id } = useParams()
+  const [commande, setCommande] = useState<Commande | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:3001/produits') // Adapté à ton NestJS
-      .then(res => res.json())
-      .then(data => {
-        setProduits(data)
+    if (!id) return
+    fetch(`http://localhost:3001/commandes/${id}`, {
+      credentials: 'include',
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data) setCommande(data)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
-  }, [])
+      .catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
+  }, [id])
+
+  if (loading) return <p className="p-6">Chargement...</p>
+  if (!commande) return <p className="p-6 text-red-600">Commande introuvable.</p>
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-6">
-      <h1 className="text-3xl font-bold text-center text-[#0070C0] mb-10">🛍️ Produits des commerçants</h1>
+      <h1 className="text-3xl font-bold text-[#0070C0] mb-4">Détail de la commande #{commande.id}</h1>
+      <p className="text-gray-600 mb-2">Date : {new Date(commande.date).toLocaleDateString()}</p>
+      <p className="text-gray-600 mb-6">Statut : {commande.statut}</p>
 
-      {loading ? (
-        <p className="text-gray-600 text-center">Chargement en cours...</p>
-      ) : produits.length === 0 ? (
-        <p className="text-gray-600 text-center">Aucun produit disponible.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {produits.map(produit => (
-            <div key={produit.id} className="bg-white rounded-2xl shadow border hover:shadow-lg p-4 transition">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <ShoppingCart className="text-green-600 w-5 h-5" />
-                </div>
-                <h2 className="text-lg font-semibold text-gray-800">{produit.nom}</h2>
-              </div>
-
+      <div className="bg-white rounded-xl shadow p-6 space-y-6">
+        {commande.produits.map((produit) => (
+          <div
+            key={produit.id}
+            className="flex items-center gap-4 border-b pb-4"
+          >
+            {produit.imageUrl && (
               <Image
                 src={produit.imageUrl}
                 alt={produit.nom}
-                width={400}
-                height={160}
-                className="rounded-xl object-cover w-full h-40 mb-4"
+                width={100}
+                height={80}
+                className="rounded-lg object-cover"
               />
-
-              <p className="text-sm text-gray-500">Vendu par : <strong>{produit.commercantNom}</strong></p>
-              <p className="text-lg font-bold text-green-700">{produit.prix} €</p>
-
-              <button className="w-full mt-4 bg-[#0070C0] hover:bg-blue-800 text-white py-2 rounded-xl transition">
-                Voir détails
-              </button>
+            )}
+            <div className="flex-1">
+              <h2 className="font-semibold text-lg">{produit.nom}</h2>
+              <p className="text-gray-600 text-sm">Quantité : {produit.quantite}</p>
+              <p className="text-gray-600 text-sm">Prix unitaire : {produit.prix.toFixed(2)} €</p>
+              <p className="text-gray-800 font-medium mt-1">
+                Sous-total : {(produit.prix * produit.quantite).toFixed(2)} €
+              </p>
             </div>
-          ))}
+          </div>
+        ))}
+
+        <div className="text-right mt-6">
+          <p className="text-xl font-bold text-[#0070C0]">
+            Total commande : {commande.total.toFixed(2)} €
+          </p>
         </div>
-      )}
+      </div>
     </div>
   )
 }

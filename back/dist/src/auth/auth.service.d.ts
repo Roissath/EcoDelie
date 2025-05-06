@@ -20,4 +20,9 @@ export declare class AuthService {
     }>;
     me(payload: any): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | null>;
     getMe(id: number): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | null>;
+    changePassword(userPayload: any, oldPassword: string, newPassword: string): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | null>;
+    findByEmail(email: string): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | null>;
+    resetPassword(token: string, password: string, confirmPassword: string): Promise<{
+        message: string;
+    }>;
 }

@@ -8,4 +8,7 @@ export class CreateColisDto {
   entrepotId?: number;
   annonceId?: number;
   livreurId?: number;
+  date_reception?: string
+  date_envoi?: string
+
 }

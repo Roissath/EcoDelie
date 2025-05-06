@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { jwtDecode } from 'jwt-decode'
 import { MessageCircle } from 'lucide-react'
+import { getUserFromCookie } from '@/lib/auth'
 
 interface Contact {
   id: number
@@ -12,13 +12,6 @@ interface Contact {
   prenom: string
   lastMessage: string
   date: string
-}
-
-interface DecodedToken {
-  id: number
-  email: string
-  type: string
-  exp: number
 }
 
 export default function Header() {
@@ -29,37 +22,21 @@ export default function Header() {
   const [showMessages, setShowMessages] = useState(false)
 
   useEffect(() => {
-    fetch('http://localhost:3001/auth/me', {
-      credentials: 'include'
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data) {
-          setIsConnected(true)
-          setUserId(data.id)
-        }
-      })
+    const fetchUser = async () => {
+      const user = await getUserFromCookie()
+      if (user) {
+        setIsConnected(true)
+        setUserId(user.id)
+
+        // Récupération des conversations liées à l'utilisateur
+        fetch(`http://localhost:3001/messages/conversations/utilisateur/${user.id}`)
+          .then((res) => res.json())
+          .then(setContacts)
+          .catch(() => setContacts([]))
+      }
+    }
+    fetchUser()
   }, [])
-  
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token')
-  //   if (token) {
-  //     try {
-  //       const decoded = jwtDecode<DecodedToken>(token)
-  //       setIsConnected(true)
-  //       setUserId(decoded.id)
-
-  //       // Récupération des conversations
-  //       fetch(`http://localhost:3001/messages/conversations/utilisateur/${decoded.id}`)
-  //         .then(res => res.json())
-  //         .then(setContacts)
-  //     } catch (err) {
-  //       console.error('Token invalide')
-  //       setIsConnected(false)
-  //     }
-  //   }
-  // }, [])
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(e.target.value)
@@ -121,8 +98,8 @@ export default function Header() {
             <Link
               href="/logout"
               onClick={() => {
-                localStorage.removeItem('token')
-                window.location.href = '/'
+                fetch('http://localhost:3001/auth/logout', { method: 'POST', credentials: 'include' })
+                  .then(() => window.location.href = '/')
               }}
               className="text-red-600 font-semibold hover:underline transition"
             >

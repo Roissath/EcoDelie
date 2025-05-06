@@ -33,6 +33,12 @@ export class LivraisonService {
     return this.repo.save(entity);
   }
   
+  findByClientId(id: number) {
+    return this.repo.find({
+      where: { client: { id } },
+      relations: ['commande', 'livreur'], // adapte selon tes entités
+    });
+  }
   
 
   async update(id: number, dto: UpdateLivraisonDto) {

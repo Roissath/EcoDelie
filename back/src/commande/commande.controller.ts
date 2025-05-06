@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Patch,
+  Request,
   Param,
   UseGuards,
 } from '@nestjs/common';
@@ -31,17 +32,33 @@ export class CommandeController {
     return this.commandeService.getByClientId(id);
   }
 
+  @Get('client/:id')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('client')
+getByClient(@Param('id') id: number) {
+  return this.commandeService.getByClientId(id);
+}
+
+
   @Get('livreur/:id')
   @Roles('livreur')
   getCommandesLivreur(@Param('id') id: number) {
     return this.commandeService.getByLivreurId(id);
   }
 
+
+
   @Get('admin')
   @Roles('admin')
   getAllCommandes() {
     return this.commandeService.findAll();
   }
+
+  @Roles('client')
+  @Get('me')
+  findByClient(@Request() req) {
+  return this.commandeService.findByClientId(req.user.id);
+}
 
   @Patch(':id')
   @Roles('admin', 'client')
@@ -51,4 +68,6 @@ export class CommandeController {
   ) {
     return this.commandeService.update(id, dto);
   }
+
+
 }

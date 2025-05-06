@@ -6,21 +6,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UtilisateurModule = void 0;
+exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const utilisateur_entity_1 = require("../utilisateur/utilisateur.entity");
-const utilisateur_service_1 = require("../utilisateur/utilisateur.service");
-const utilisateur_controller_1 = require("../utilisateur/utilisateur.controller");
-let UtilisateurModule = class UtilisateurModule {
+const auth_service_1 = require("./auth.service");
+const auth_controller_1 = require("./auth.controller");
+const jwt_1 = require("@nestjs/jwt");
+const jwt_strategy_1 = require("./jwt.strategy");
+const utilisateur_module_1 = require("../utilisateur/utilisateur.module");
+const passport_1 = require("@nestjs/passport");
+let AuthModule = class AuthModule {
 };
-exports.UtilisateurModule = UtilisateurModule;
-exports.UtilisateurModule = UtilisateurModule = __decorate([
+exports.AuthModule = AuthModule;
+exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([utilisateur_entity_1.Utilisateur])],
-        providers: [utilisateur_service_1.UtilisateurService],
-        controllers: [utilisateur_controller_1.UtilisateurController],
-        exports: [utilisateur_service_1.UtilisateurService, typeorm_1.TypeOrmModule],
+        imports: [
+            passport_1.PassportModule,
+            jwt_1.JwtModule.register({
+                secret: 'super-secret-key',
+                signOptions: { expiresIn: '7d' },
+            }),
+            utilisateur_module_1.UtilisateurModule,
+        ],
+        controllers: [auth_controller_1.AuthController],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
+        exports: [auth_service_1.AuthService],
     })
-], UtilisateurModule);
+], AuthModule);
 //# sourceMappingURL=auth.module.js.map

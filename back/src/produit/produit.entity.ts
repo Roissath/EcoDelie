@@ -4,11 +4,14 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  ManyToMany,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { Utilisateur } from '../utilisateur/utilisateur.entity';
 import { CommentaireProduit } from '../commentaire-produit/commentaire-produit.entity';
+import { Commande } from '../commande/commande.entity';
+
 
 @Entity()
 export class Produit {
@@ -20,6 +23,9 @@ export class Produit {
 
   @Column()
   descriptif!: string;
+
+  @Column()
+  image?: string;
 
   @CreateDateColumn()
   date_publication!: Date;
@@ -41,4 +47,8 @@ export class Produit {
   // 🔁 Un produit peut avoir plusieurs commentaires
   @OneToMany(() => CommentaireProduit, (c) => c.produit, { cascade: true })
   commentaires!: CommentaireProduit[];
+
+  @ManyToMany(() => Commande, (commande) => commande.produits)
+commandes!: Commande[];
+
 }

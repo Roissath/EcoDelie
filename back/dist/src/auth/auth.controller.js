@@ -18,10 +18,15 @@ const auth_service_1 = require("./auth.service");
 const register_auth_dto_ts_1 = require("./dto/register-auth.dto.ts");
 const login_auth_dto_1 = require("./dto/login-auth.dto");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const utilisateur_service_1 = require("../utilisateur/utilisateur.service");
+const crypto_1 = require("crypto");
+const common_2 = require("@nestjs/common");
 let AuthController = class AuthController {
     authService;
-    constructor(authService) {
+    utilisateurService;
+    constructor(authService, utilisateurService) {
         this.authService = authService;
+        this.utilisateurService = utilisateurService;
     }
     async register(dto, res) {
         const { access_token, user } = await this.authService.register(dto);
@@ -37,8 +42,8 @@ let AuthController = class AuthController {
         const { access_token, user } = await this.authService.login(dto);
         res.cookie('jwt', access_token, {
             httpOnly: true,
-            secure: false,
             sameSite: 'lax',
+            secure: false,
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
         return user;
@@ -49,6 +54,25 @@ let AuthController = class AuthController {
     async logout(res) {
         res.clearCookie('jwt');
         return { message: 'Déconnecté avec succès' };
+    }
+    async changePassword(req, body) {
+        return this.authService.changePassword(req.user, body.oldPassword, body.newPassword);
+    }
+    async forgotPassword(email) {
+        const user = await this.utilisateurService.findByEmail(email);
+        if (!user)
+            return { message: 'Si cet email existe, un lien a été envoyé.' };
+        const token = (0, crypto_1.randomUUID)();
+        const expires = new Date(Date.now() + 1000 * 60 * 60);
+        user.resetToken = token;
+        user.resetTokenExpires = expires;
+        await this.utilisateurService.update(user.id, user);
+        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        console.log('Lien de réinitialisation :', resetLink);
+        return { message: 'Si cet email existe, un lien a été envoyé.' };
+    }
+    async resetPassword(token, body) {
+        return this.authService.resetPassword(token, body.password, body.confirmPassword);
     }
 };
 exports.AuthController = AuthController;
@@ -83,8 +107,33 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Patch)('change-password'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "changePassword", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('reset-password/:token'),
+    __param(0, (0, common_2.Param)('token')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        utilisateur_service_1.UtilisateurService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

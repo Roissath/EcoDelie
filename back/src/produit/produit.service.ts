@@ -14,7 +14,7 @@ export class ProduitService {
     private readonly repo: Repository<Produit>,
   ) {}
 
-  // ✅ Créer un produit
+  //  Créer un produit
   create(dto: CreateProduitDto) {
     const produit = this.repo.create({
       ...dto,
@@ -23,17 +23,17 @@ export class ProduitService {
     return this.repo.save(produit);
   }
 
-  // ✅ Voir tous les produits publics (pour les clients)
+  //  Voir tous les produits publics (pour les clients)
   findAllPublic() {
     return this.repo.find({
       where: {
         stock: MoreThan(0),
       },
-      relations: ['utilisateur', 'commentaires'],
+      relations: ['utilisateur', 'commentaires'],//pour afficher le vendeur 
     });
   }
 
-  // ✅ Produits d’un commerçant
+  //  Produits d’un commerçant
   findByCommercantId(id: number) {
     return this.repo.find({
       where: {
@@ -43,14 +43,29 @@ export class ProduitService {
     });
   }
 
-  // ✅ Modifier un produit
+  // Modifier un produit
   async update(id: number, dto: UpdateProduitDto) {
     await this.repo.update(id, dto);
     return this.repo.findOne({ where: { id } });
   }
 
-  // ✅ Supprimer un produit
+  //  Supprimer un produit
   remove(id: number) {
     return this.repo.delete(id);
   }
+
+  async findOne(id: number) {
+    return this.repo.findOne({
+      where: { id },
+      relations: ['utilisateur'],
+    });
+  }
+  
+  async findByCategorie(categorie: string) {
+    return this.repo.find({
+      where: { categorie },
+      relations: ['utilisateur'],
+    });
+  }
+  
 }

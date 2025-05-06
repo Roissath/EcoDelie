@@ -56,7 +56,7 @@ export default function ProduitDetail() {
 
   if (loading) return <p className="p-6 text-gray-600">Chargement en cours...</p>
   if (!produit) return <p className="p-6 text-red-600">Produit introuvable.</p>
-
+  
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-6 space-y-12">
       {/* Bloc haut : fiche produit */}
@@ -91,13 +91,28 @@ export default function ProduitDetail() {
           <p className="text-2xl font-bold text-green-700 mb-6">{produit.prix.toFixed(2)} €</p>
 
           <button
-            className={`w-full py-2 px-4 text-white rounded-xl font-semibold transition ${
-              produit.stock === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0070C0] hover:bg-blue-800'
-            }`}
-            disabled={produit.stock === 0}
-          >
-            Ajouter au panier
-          </button>
+  onClick={() => {
+    if (!produit) return;
+    const panier = JSON.parse(localStorage.getItem('panier') || '[]');
+
+    const existant = panier.find((p: any) => p.id === produit.id);
+    if (existant) {
+      existant.quantite += 1;
+    } else {
+      panier.push({ ...produit, quantite: 1 });
+    }
+
+    localStorage.setItem('panier', JSON.stringify(panier));
+    alert('Produit ajouté au panier');
+  }}
+  className={`w-full py-2 px-4 text-white rounded-xl font-semibold transition ${
+    produit.stock === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0070C0] hover:bg-blue-800'
+  }`}
+  disabled={produit.stock === 0}
+>
+  Ajouter au panier
+</button>
+
         </div>
       </div>
 

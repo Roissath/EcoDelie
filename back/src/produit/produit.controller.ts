@@ -27,13 +27,13 @@ export class ProduitController {
     return this.produitService.create(dto);
   }
 
-  // ✅ Tous les produits publics (accessible à tous)
+  //  Tous les produits publics (accessible à tous)
   @Get('/public')
   findAllPublic() {
     return this.produitService.findAllPublic();
   }
 
-  // ✅ Produits d’un commerçant
+  //  Produits d’un commerçant
   @Get('/commercant/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('commercant')
@@ -41,7 +41,7 @@ export class ProduitController {
     return this.produitService.findByCommercantId(id);
   }
 
-  // ✅ Mise à jour d’un produit
+  //  Mise à jour d’un produit
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('commercant', 'admin')
@@ -49,11 +49,22 @@ export class ProduitController {
     return this.produitService.update(id, dto);
   }
 
-  // ✅ Suppression d’un produit
+  //  Suppression d’un produit
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('commercant', 'admin')
   remove(@Param('id') id: number) {
     return this.produitService.remove(id);
   }
+
+  @Get(':id')
+findOne(@Param('id') id: number) {
+  return this.produitService.findOne(+id);
+}
+@Get('/categorie/:categorie')
+findByCategorie(@Param('categorie') categorie: string) {
+  return this.produitService.findByCategorie(categorie);
+}
+
+
 }

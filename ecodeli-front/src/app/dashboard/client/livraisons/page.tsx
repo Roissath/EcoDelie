@@ -1,83 +1,81 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Truck } from 'lucide-react'
+import Link from 'next/link'
 
 interface Livraison {
   id: number
-  statut: string
-  adresse: string
   date_livraison: string
-  commande: {
+  adresse: string
+  statut: string
+  commande?: {
     id: number
-    date_commande: string
     prix_unitaire: number
-  }
-  livreur?: {
-    nom: string
-    prenom: string
+    date_commande: string
   }
 }
 
-export default function LivraisonsClient() {
+export default function LivraisonsClientPage() {
   const [livraisons, setLivraisons] = useState<Livraison[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const clientId = 1 // ⚠️ Remplacer par le vrai ID connecté plus tard
-
-    fetch(`http://localhost:3001/livraisons/client/${clientId}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch('http://localhost:3000/livraison/client/me', {
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
         setLivraisons(data)
         setLoading(false)
       })
       .catch(() => setLoading(false))
   }, [])
 
-  return (
-    <div className="min-h-screen bg-[#FAFAFA] p-6">
-      <h1 className="text-3xl font-bold text-[#0070C0] mb-6 flex items-center gap-2">
-        <Truck className="w-7 h-7 text-green-600" />
-        Suivi de mes livraisons
-      </h1>
+  if (loading) return <div className="text-center py-10 text-lg">Chargement des livraisons...</div>
 
-      {loading ? (
-        <p className="text-gray-600">Chargement en cours...</p>
-      ) : livraisons.length === 0 ? (
-        <p className="text-gray-500">Aucune livraison trouvée.</p>
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Mes Livraisons</h1>
+      {livraisons.length === 0 ? (
+        <p className="text-center text-gray-500">Aucune livraison pour le moment.</p>
       ) : (
-        <ul className="space-y-6">
-          {livraisons.map((liv) => (
-            <li key={liv.id} className="bg-white rounded-xl shadow p-4 flex flex-col sm:flex-row justify-between sm:items-center">
-              <div>
-                <h2 className="text-lg font-bold text-gray-800 mb-1">
-                  Commande #{liv.commande?.id}
-                </h2>
-                <p className="text-sm text-gray-600">Adresse : {liv.adresse}</p>
-                <p className="text-sm text-gray-600">
-                  Livré par : {liv.livreur ? `${liv.livreur.prenom} ${liv.livreur.nom}` : 'Non encore assigné'}
-                </p>
-                <p className="text-sm text-gray-700 mt-1">
-                  Date prévue : {new Date(liv.date_livraison).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="text-right mt-2 sm:mt-0">
+        <div className="grid gap-6">
+          {livraisons.map((livraison) => (
+            <div key={livraison.id} className="border border-gray-200 rounded-2xl p-5 shadow bg-white hover:shadow-md transition">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-semibold text-gray-500">Livraison #{livraison.id}</span>
                 <span
-                  className={`inline-block px-4 py-1 rounded-full text-sm font-semibold ${
-                    liv.statut === 'livré'
-                      ? 'bg-green-100 text-green-800'
-                      : liv.statut === 'en route'
+                  className={`text-sm px-3 py-1 rounded-full ${
+                    livraison.statut === 'livrée'
+                      ? 'bg-green-100 text-green-700'
+                      : livraison.statut === 'en cours'
                       ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-gray-100 text-gray-700'
+                      : 'bg-gray-100 text-gray-600'
                   }`}
                 >
-                  {liv.statut}
+                  {livraison.statut}
                 </span>
               </div>
-            </li>
+              <p className="text-gray-700"><strong>Adresse :</strong> {livraison.adresse}</p>
+              <p className="text-gray-700"><strong>Date prévue :</strong> {new Date(livraison.date_livraison).toLocaleDateString()}</p>
+
+              {livraison.commande && (
+                <div className="mt-2 text-sm text-gray-600">
+                  <p><strong>Commande liée :</strong> #{livraison.commande.id}</p>
+                  <p><strong>Prix :</strong> {livraison.commande.prix_unitaire} €</p>
+                  <p><strong>Date commande :</strong> {new Date(livraison.commande.date_commande).toLocaleDateString()}</p>
+                </div>
+              )}
+
+              <Link
+                href={`/dashboard/client/livraisons/${livraison.id}`}
+                className="mt-3 inline-block text-blue-600 hover:underline text-sm font-medium"
+              >
+                Voir les détails
+              </Link>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )

@@ -6,5 +6,9 @@ export class CreateCommandeDto {
   clientId!: number;
   factureId?: number;
   client!: { id: number };
+  produitIds!: number[];
   utilisateur!: { id: number };
+  colisId?: number;
+
 }
+

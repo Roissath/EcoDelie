@@ -6,15 +6,23 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
+      //  Lecture du token depuis les cookies HTTP-only
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => req?.cookies?.jwt,
+        (req) => {
+          return req?.cookies?.jwt || null;
+        },
       ]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'dev-secret',
+      secretOrKey: process.env.JWT_SECRET || 'super-secret-key', //  remplace en prod par process.env
     });
   }
 
+  //  Ce que tu retrouves dans req.user
   async validate(payload: any) {
-    return { sub: payload.sub, email: payload.email, role: payload.role };
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
   }
 }

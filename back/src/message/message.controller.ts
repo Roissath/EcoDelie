@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -20,6 +28,14 @@ export class MessageController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(+id);
+  }
+
+  @Get('conversation/:user1Id/:user2Id')
+  getConversation(
+    @Param('user1Id') user1Id: number,
+    @Param('user2Id') user2Id: number,
+  ) {
+    return this.service.getConversationBetweenUsers(user1Id, user2Id);
   }
 
   @Patch(':id')

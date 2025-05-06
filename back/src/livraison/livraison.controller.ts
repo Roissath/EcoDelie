@@ -6,13 +6,14 @@ import {
   Delete,
   Param,
   Body,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { LivraisonService } from './livraison.service';
 import { CreateLivraisonDto } from './dto/create-livraison.dto';
 import { UpdateLivraisonDto } from './dto/update-livraison.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-
+import { Roles } from 'src/comon/decorators/roles.decorator';
 @Controller('livraison')
 @UseGuards(JwtAuthGuard)
 export class LivraisonController {
@@ -22,6 +23,13 @@ export class LivraisonController {
   create(@Body() dto: CreateLivraisonDto) {
     return this.service.create(dto);
   }
+
+  @Get('me')
+@Roles('client')
+findForClient(@Request() req) {
+  return this.service.findByClientId(req.user.id);
+}
+
 
   @Get()
   findAll() {

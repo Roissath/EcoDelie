@@ -1,180 +1,118 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    age: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'client',
-  })
+  const [nom, setNom] = useState('')
+  const [prenom, setPrenom] = useState('')
+  const [email, setEmail] = useState('')
+  const [mot_de_passe, setMotDePasse] = useState('')
+  const [adresse, setAdresse] = useState('')
+  const [telephone, setTelephone] = useState('')
+  const [login, setLogin] = useState('')
+  const [datdenaissance, setDatDeNaissance] = useState('')
+  const [age, setAge] = useState<number | ''>('')
+  const [langue_utilise, setLangueUtilise] = useState('fr')
+  const [type, setType] = useState('')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+  const [error, setError] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (formData.password !== formData.confirmPassword) {
-      alert('❌ Les mots de passe ne correspondent pas.')
-      return
-    }
+    setError('')
 
     try {
-      const { confirmPassword, ...dataToSend } = formData // on enlève confirmPassword pour l'API
-
       const res = await fetch('http://localhost:3001/auth/register', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
+        body: JSON.stringify({
+          nom,
+          prenom,
+          email,
+          mot_de_passe,
+          adresse,
+          telephone,
+          login,
+          datdenaissance,
+          age: age ? Number(age) : undefined,
+          langue_utilise,
+          type
+        }),
       })
 
       const data = await res.json()
-      console.log(data)
 
       if (res.ok) {
-        alert('✅ Inscription réussie, bienvenue chez EcoDeli !')
+        switch (type) {
+          case 'client':
+            router.push('/dashboard/client')
+            break
+          case 'livreur':
+            router.push('/dashboard/livreur')
+            break
+          case 'prestataire':
+            router.push('/dashboard/prestataire')
+            break
+          case 'commercant':
+            router.push('/dashboard/commercant')
+            break
+          default:
+            router.push('/')
+        }
+        router.push('/login')
       } else {
-        alert(`Erreur ❌ : ${data.message}`)
+        setError(data.message || 'Erreur lors de l’inscription.')
       }
     } catch (err) {
-      alert('Erreur serveur')
+      console.error(err)
+      setError("Une erreur est survenue lors de l'inscription.")
     }
   }
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-8">
-      <div className="w-full max-w-2xl bg-white p-10 rounded-3xl shadow-2xl space-y-8">
+      <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-2xl space-y-6">
 
         {/* Logo */}
         <div className="flex justify-center">
-          <Image src="/Logo_v2.png" alt="EcoDeli Logo" width={100} height={100} />
+          <Image src="/Logo_v2.png" alt="Logo EcoDeli" width={80} height={80} />
         </div>
 
-        {/* Titre */}
-        <h1 className="text-center text-3xl font-extrabold text-[#0070C0]">Créer votre compte EcoDeli</h1>
+        <h1 className="text-center text-2xl font-extrabold text-[#0070C0]">Inscription à EcoDeli</h1>
 
-        {/* Formulaire */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Infos personnelles */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 font-semibold mb-1">Nom</label>
-              <input
-                type="text"
-                name="nom"
-                value={formData.nom}
-                onChange={handleChange}
-                placeholder="Votre nom"
-                required
-                className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-1">Prénom</label>
-              <input
-                type="text"
-                name="prenom"
-                value={formData.prenom}
-                onChange={handleChange}
-                placeholder="Votre prénom"
-                required
-                className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-              />
-            </div>
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-xl text-sm font-medium text-center">
+            {error}
           </div>
+        )}
 
-          {/* Age */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">Âge</label>
-            <input
-              type="number"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              placeholder="Votre âge"
-              required
-              className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input type="text" placeholder="Nom" value={nom} onChange={(e) => setNom(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="text" placeholder="Prénom" value={prenom} onChange={(e) => setPrenom(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="email" placeholder="Adresse email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="password" placeholder="Mot de passe" value={mot_de_passe} onChange={(e) => setMotDePasse(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="text" placeholder="Adresse" value={adresse} onChange={(e) => setAdresse(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="text" placeholder="Téléphone" value={telephone} onChange={(e) => setTelephone(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="text" placeholder="Nom d'utilisateur (login)" value={login} onChange={(e) => setLogin(e.target.value)} required className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="date" placeholder="Date de naissance" value={datdenaissance} onChange={(e) => setDatDeNaissance(e.target.value)} className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="number" placeholder="Âge" value={age} onChange={(e) => setAge(e.target.value ? Number(e.target.value) : '')} className="w-full p-3 bg-gray-100 rounded-xl text-black" />
+          <input type="text" placeholder="Langue (ex: fr)" value={langue_utilise} onChange={(e) => setLangueUtilise(e.target.value)} className="w-full p-3 bg-gray-100 rounded-xl text-black" />
 
-          {/* Email */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">Adresse email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="exemple@ecodeli.com"
-              required
-              className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-            />
-          </div>
+          <select value={type} onChange={(e) => setType(e.target.value)} className="w-full p-3 bg-gray-100 rounded-xl text-black">
+            <option value="client">Client</option>
+            <option value="livreur">Livreur</option>
+            <option value="prestataire">Prestataire</option>
+            <option value="commercant">Commerçant</option>
+          </select>
 
-          {/* Mot de passe */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">Mot de passe</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Minimum 8 caractères"
-              required
-              className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">Utilisez au moins 8 caractères, une majuscule et un chiffre.</p>
-          </div>
-
-          {/* Confirmer mot de passe */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">Confirmer mot de passe</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirmez votre mot de passe"
-              required
-              className="w-full p-3 bg-gray-100 rounded-xl placeholder-gray-500"
-            />
-          </div>
-
-          {/* Sélection du type d'utilisateur */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">Vous êtes :</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-100 rounded-xl text-gray-700"
-              required
-            >
-              <option value="client">Client</option>
-              <option value="livreur">Livreur</option>
-              <option value="commercant">Commerçant</option>
-              <option value="prestataire">Prestataire</option>
-            </select>
-          </div>
-
-          {/* Bouton inscription */}
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition"
-          >
+          <button type="submit" className="w-full bg-green-600 text-white font-semibold py-3 rounded-xl hover:bg-green-700 transition">
             S'inscrire
           </button>
-
         </form>
-
       </div>
     </div>
   )

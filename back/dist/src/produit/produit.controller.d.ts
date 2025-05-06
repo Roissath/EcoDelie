@@ -9,4 +9,6 @@ export declare class ProduitController {
     findByCommercant(id: number): Promise<import("./produit.entity").Produit[]>;
     update(id: number, dto: UpdateProduitDto): Promise<import("./produit.entity").Produit | null>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;
+    findOne(id: number): Promise<import("./produit.entity").Produit | null>;
+    findByCategorie(categorie: string): Promise<import("./produit.entity").Produit[]>;
 }

@@ -5,12 +5,15 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { Entrepot } from '../entrepot/entrepot.entity';
 import { Annonce } from '../annonce/annonce.entity';
 import { Utilisateur } from '../utilisateur/utilisateur.entity';
 import { Stokage } from '../stokage/stokage.entity';
+import { Commande } from 'src/commande/commande.entity';
+
 
 @Entity()
 export class Colis {
@@ -58,4 +61,8 @@ export class Colis {
 
   @OneToMany(() => Stokage, (stokage) => stokage.colis)
   stokages!: Stokage[];
+
+@OneToOne(() => Commande, (commande) => commande.colis)
+commande!: Commande;
+
 }

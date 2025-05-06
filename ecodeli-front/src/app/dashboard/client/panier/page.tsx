@@ -18,7 +18,6 @@ export default function PanierClient() {
   const [panier, setPanier] = useState<Produit[]>([])
   const [total, setTotal] = useState(0)
 
-  // Charger le panier depuis localStorage
   useEffect(() => {
     const saved = localStorage.getItem('panier')
     if (saved) {
@@ -49,29 +48,28 @@ export default function PanierClient() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-6">
-      <h1 className="text-3xl font-bold text-[#0070C0] mb-6">Mon panier</h1>
+      <h1 className="text-3xl font-bold text-[#0070C0] mb-6">🛒 Mon Panier</h1>
 
       {panier.length === 0 ? (
         <p className="text-gray-600">Votre panier est vide.</p>
       ) : (
-        <>
-          <div className="space-y-6">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Colonne des produits */}
+          <div className="lg:col-span-2 space-y-6">
             {panier.map((produit) => (
-              <div key={produit.id} className="bg-white rounded-xl shadow p-4 flex items-center gap-4 justify-between">
-                {/* Image produit */}
-                <div className="flex items-center gap-4 flex-1">
+              <div key={produit.id} className="bg-white rounded-xl shadow flex flex-col md:flex-row items-center p-4 gap-4">
+                <div className="flex items-center gap-4 w-full md:w-2/3">
                   {produit.imageUrl && (
                     <Image src={produit.imageUrl} alt={produit.nom} width={100} height={80} className="rounded-lg object-cover" />
                   )}
                   <div>
-                    <h2 className="text-lg font-bold">{produit.nom}</h2>
-                    <p className="text-sm text-gray-600">{produit.prix.toFixed(2)} €</p>
+                    <h2 className="text-lg font-bold text-gray-800">{produit.nom}</h2>
+                    <p className="text-sm text-gray-500">Prix unitaire : {produit.prix.toFixed(2)} €</p>
                   </div>
                 </div>
 
-                {/* Choix de quantité */}
                 <div className="flex items-center gap-2">
-                  <label htmlFor={`qte-${produit.id}`} className="text-sm text-gray-700">Quantité :</label>
+                  <label htmlFor={`qte-${produit.id}`} className="text-sm">Quantité :</label>
                   <input
                     id={`qte-${produit.id}`}
                     type="number"
@@ -83,26 +81,38 @@ export default function PanierClient() {
                   />
                 </div>
 
-                {/* Supprimer */}
-                <button onClick={() => supprimerProduit(produit.id)} className="text-red-500 hover:text-red-700">
+                <button
+                  onClick={() => supprimerProduit(produit.id)}
+                  className="text-red-500 hover:text-red-700"
+                  title="Supprimer du panier"
+                >
                   <Trash2 />
                 </button>
               </div>
             ))}
           </div>
 
-          {/* Récap */}
-          <div className="mt-10 bg-white rounded-xl shadow p-6">
+          {/* Colonne récapitulatif */}
+          <div className="bg-white rounded-xl shadow p-6 h-fit">
             <h2 className="text-xl font-semibold mb-4">Récapitulatif</h2>
-            <p className="text-lg text-gray-800 font-bold">Total : {total} €</p>
+            <div className="space-y-2">
+              {panier.map(p => (
+                <div key={p.id} className="flex justify-between text-sm text-gray-700">
+                  <span>{p.nom} x {p.quantite}</span>
+                  <span>{(p.prix * p.quantite).toFixed(2)} €</span>
+                </div>
+              ))}
+            </div>
+            <hr className="my-4" />
+            <p className="text-lg font-bold text-gray-800">Total : {total} €</p>
 
-            <Link href="/client/commande">
-              <button className="mt-4 bg-[#0070C0] text-white px-6 py-2 rounded-xl hover:bg-blue-800 transition">
-                Passer la commande
+            <Link href="/dashboard/client/commande">
+              <button className="mt-4 w-full bg-[#0070C0] text-white py-2 rounded-xl hover:bg-blue-800 transition">
+                Valider la commande
               </button>
             </Link>
           </div>
-        </>
+        </div>
       )}
     </div>
   )

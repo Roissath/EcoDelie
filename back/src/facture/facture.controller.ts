@@ -54,4 +54,11 @@ export class FactureController {
   remove(@Param('id') id: number) {
     return this.factureService.remove(id);
   }
+
+  @Post('generate-pdf/:id')
+@Roles('admin')
+generatePdf(@Param('id') id: number) {
+  return this.factureService.generateAndSavePdf(+id);
+}
+
 }

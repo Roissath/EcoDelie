@@ -36,11 +36,14 @@ let UtilisateurService = class UtilisateurService {
         return this.repo.save(user);
     }
     async update(id, dto) {
-        await this.repo.update(id, dto);
+        await this.repo.save({ id, ...dto });
         return this.findOne(id);
     }
     remove(id) {
         return this.repo.delete(id);
+    }
+    async findByResetToken(token) {
+        return this.repo.findOne({ where: { resetToken: token } });
     }
 };
 exports.UtilisateurService = UtilisateurService;

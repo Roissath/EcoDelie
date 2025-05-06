@@ -37,4 +37,19 @@ export class MessageService {
   remove(id: number) {
     return this.repo.delete(id);
   }
+
+  async getConversationBetweenUsers(user1Id: number, user2Id: number) {
+    return this.repo.find({
+      where: [
+        { expediteur: { id: user1Id }, destinataire: { id: user2Id } },
+        { expediteur: { id: user2Id }, destinataire: { id: user1Id } },
+      ],
+      relations: ['expediteur', 'destinataire'],
+      order: { date_envoi: 'ASC' },
+    });
+  }
+  
+
+
+
 }

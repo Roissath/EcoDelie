@@ -1,30 +1,45 @@
+// main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const facturesDir = join(__dirname, '..', 'public', 'factures');
+  if (!existsSync(facturesDir)) {
+    mkdirSync(facturesDir, { recursive: true });
+    console.log(' Dossier public/factures créé automatiquement');
+  }
 
-  // 🔐 Pour parser les cookies (utile pour JWT sécurisé en HTTP-only)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
   app.use(cookieParser());
-
-  // 🌍 Pour autoriser les appels API depuis le front (ex: http://localhost:3001)
+ 
   app.enableCors({
-    origin: ['http://localhost:3001'], // 🔁 à adapter selon ton front
-    credentials: true, // Permet d’envoyer les cookies (important pour auth sécurisée)
-  });
-
-  // ✅ Validation automatique avec DTOs et suppression des champs non autorisés
+    origin: 'http://localhost:3000', // front
+    credentials: true,
+  })
+  
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // ignore les champs non déclarés dans le DTO
-      forbidNonWhitelisted: true, // rejette les champs inconnus
-      transform: true, // transforme les types (ex: string → number)
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
-  await app.listen(3000);
-  console.log(' Serveur NestJS démarré sur http://localhost:3000');
+  //  Sert les PDF via http://localhost:3001/factures/xxx.pdf
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/',
+  });
+
+  await app.listen(3001);
+  console.log('✅ Serveur NestJS démarré sur http://localhost:3001');
+
+
+  
 }
 bootstrap();

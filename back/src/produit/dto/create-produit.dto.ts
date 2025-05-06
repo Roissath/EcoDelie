@@ -5,5 +5,6 @@ export class CreateProduitDto {
   prix!: number;
   stock!: number;
   categorie!: string;
+  image?: string
   utilisateurId!: number; // id du commerçant
 }

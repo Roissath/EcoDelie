@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { AuthModule } from './auth/auth.module';
+
 import { UtilisateurModule } from './utilisateur/utilisateur.module';
 import { InfoClientModule } from './info-client/info-client.module';
 import { InfoPrestataireModule } from './info-prestataire/info-prestataire.module';
@@ -48,6 +50,7 @@ import { ContractModule } from './contract/contract.module';
     }),
     AdminModule,
     DocumentModule,
+    AuthModule, // ← ce module doit être présent
     UtilisateurModule,
     InfoClientModule,
     InfoLivreurModule,

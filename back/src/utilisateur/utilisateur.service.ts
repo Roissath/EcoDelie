@@ -30,7 +30,7 @@ export class UtilisateurService {
   }
 
   async update(id: number, dto: UpdateUtilisateurDto) {
-    await this.repo.update(id, dto);
+    await this.repo.save({ id, ...dto });
     return this.findOne(id);
   }
 
@@ -38,5 +38,10 @@ export class UtilisateurService {
     return this.repo.delete(id);
   }
 
+  
+  async findByResetToken(token: string) {
+    return this.repo.findOne({ where: { resetToken: token } });
+  }
+  
   
 }

@@ -1,7 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { PaiementService } from './paiement.service';
 import { CreatePaiementDto } from './dto/create-paiement.dto';
 import { UpdatePaiementDto } from './dto/update-paiement.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Request,Response } from 'express';
 
 @Controller('paiements')
 export class PaiementController {
@@ -31,4 +44,16 @@ export class PaiementController {
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  findMyPaiements(@Req() req: Request) {
+    return this.service.findByUtilisateurId(req.user['id']);
+  }
+
+  @Get(':id/facture')
+@UseGuards(JwtAuthGuard)
+generateFacture(@Param('id') id: string, @Res() res: Response) {
+  return this.service.generateFacture(+id, res);
+}
 }

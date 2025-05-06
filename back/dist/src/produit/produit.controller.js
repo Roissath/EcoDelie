@@ -40,6 +40,12 @@ let ProduitController = class ProduitController {
     remove(id) {
         return this.produitService.remove(id);
     }
+    findOne(id) {
+        return this.produitService.findOne(+id);
+    }
+    findByCategorie(categorie) {
+        return this.produitService.findByCategorie(categorie);
+    }
 };
 exports.ProduitController = ProduitController;
 __decorate([
@@ -85,6 +91,20 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ProduitController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ProduitController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('/categorie/:categorie'),
+    __param(0, (0, common_1.Param)('categorie')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ProduitController.prototype, "findByCategorie", null);
 exports.ProduitController = ProduitController = __decorate([
     (0, common_1.Controller)('produit'),
     __metadata("design:paramtypes", [produit_service_1.ProduitService])

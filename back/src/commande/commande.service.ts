@@ -28,9 +28,10 @@ export class CommandeService {
   getByClientId(id: number) {
     return this.repo.find({
       where: { client: { id } },
-      relations: ['client'],
+      relations: ['livraison', 'facture'], // adapte si nécessaire
     });
   }
+  
 
   getByLivreurId(id: number) {
     return this.repo.find({
@@ -45,9 +46,11 @@ export class CommandeService {
       utilisateur: { id: dto.utilisateurId },
       client: { id: dto.clientId },
       facture: dto.factureId ? { id: dto.factureId } : undefined,
+      produits: dto.produitIds.map((id) => ({ id })),
     });
     return this.repo.save(entity);
   }
+  
   
 
   async update(id: number, dto: UpdateCommandeDto) {
@@ -58,4 +61,13 @@ export class CommandeService {
   remove(id: number) {
     return this.repo.delete(id);
   }
+
+  findByClientId(id: number) {
+    return this.repo.find({
+      where: { client: { id } },
+      relations: ['utilisateur', 'client', 'facture', 'livraison', 'colis', 'produits']
+    });
+  }
+  
+  
 }

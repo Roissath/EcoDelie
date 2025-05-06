@@ -27,7 +27,7 @@ export default function ProfilClientPage() {
   const router = useRouter()
 
   useEffect(() => {
-    fetch('http://localhost:3000/auth/me', { credentials: 'include' })
+    fetch('http://localhost:3001/auth/me', { credentials: 'include' })
       .then(res => res.ok ? res.json() : null)
       .then(data => setUser(data))
   }, [])
@@ -39,7 +39,7 @@ export default function ProfilClientPage() {
   }
 
   const handleSave = () => {
-    fetch(`http://localhost:3000/utilisateur/${user?.id}`, {
+    fetch(`http://localhost:3001/utilisateur/${user?.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
@@ -53,7 +53,7 @@ export default function ProfilClientPage() {
       alert('Les mots de passe ne correspondent pas')
       return
     }
-    const res = await fetch('http://localhost:3000/auth/change-password', {
+    const res = await fetch('http://localhost:3001/auth/change-password', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -72,7 +72,7 @@ export default function ProfilClientPage() {
 
   const handleDeleteAccount = async () => {
     if (!confirm('Es-tu sûr de vouloir supprimer ton compte ?')) return
-    const res = await fetch('http://localhost:3000/utilisateurs/${user?.id}', {
+    const res = await fetch('http://localhost:3001/utilisateurs/${user?.id}', {
       method: 'DELETE',
       credentials: 'include'
     })

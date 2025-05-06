@@ -68,6 +68,15 @@ export class Utilisateur {
   @Column({ type: 'enum', enum: Role })
   type!: Role;
 
+
+  @Column({ type: 'varchar', nullable: true })
+resetToken?: string | null;
+
+@Column({ type: 'timestamp', nullable: true })
+resetTokenExpires?: Date | null;
+
+
+
   // Relations
 
   @OneToOne(() => InfoClient, (c) => c.utilisateur, { cascade: true })

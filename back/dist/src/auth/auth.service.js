@@ -22,6 +22,10 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(dto) {
+        const existingUser = await this.utilisateurService.findByEmail(dto.email);
+        if (existingUser) {
+            throw new common_1.ConflictException('Cet email est déjà utilisé');
+        }
         const hashedPassword = await bcrypt.hash(dto.mot_de_passe, 10);
         const user = await this.utilisateurService.create({
             ...dto,
@@ -53,6 +57,36 @@ let AuthService = class AuthService {
     }
     async getMe(id) {
         return this.utilisateurService.findOne(id);
+    }
+    async changePassword(userPayload, oldPassword, newPassword) {
+        const user = await this.utilisateurService.findOne(userPayload.id);
+        if (!user) {
+            throw new common_1.UnauthorizedException('Utilisateur introuvable');
+        }
+        const isMatch = await bcrypt.compare(oldPassword, user.mot_de_passe);
+        if (!isMatch) {
+            throw new common_1.UnauthorizedException('Ancien mot de passe incorrect');
+        }
+        const hashed = await bcrypt.hash(newPassword, 10);
+        user.mot_de_passe = hashed;
+        return this.utilisateurService.update(user.id, user);
+    }
+    async findByEmail(email) {
+        return this.utilisateurService.findByEmail(email);
+    }
+    async resetPassword(token, password, confirmPassword) {
+        if (password !== confirmPassword) {
+            throw new common_1.BadRequestException("Les mots de passe ne correspondent pas");
+        }
+        const user = await this.utilisateurService.findByResetToken(token);
+        if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
+            throw new common_1.BadRequestException("Lien invalide ou expiré");
+        }
+        user.mot_de_passe = await bcrypt.hash(password, 10);
+        user.resetToken = null;
+        user.resetTokenExpires = null;
+        await this.utilisateurService.update(user.id, user);
+        return { message: "Mot de passe mis à jour avec succès" };
     }
 };
 exports.AuthService = AuthService;

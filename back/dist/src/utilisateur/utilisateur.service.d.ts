@@ -11,4 +11,5 @@ export declare class UtilisateurService {
     create(dto: CreateUtilisateurDto): Promise<Utilisateur>;
     update(id: number, dto: UpdateUtilisateurDto): Promise<Utilisateur | null>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;
+    findByResetToken(token: string): Promise<Utilisateur | null>;
 }
