@@ -50,6 +50,14 @@ let InfoPrestataireService = class InfoPrestataireService {
     remove(id) {
         return this.repo.delete(id);
     }
+    async findByUtilisateurId(utilisateurId) {
+        return this.repo.findOne({
+            where: {
+                utilisateur: { id: utilisateurId },
+            },
+            relations: ['utilisateur', 'annonce', 'contract'],
+        });
+    }
 };
 exports.InfoPrestataireService = InfoPrestataireService;
 exports.InfoPrestataireService = InfoPrestataireService = __decorate([

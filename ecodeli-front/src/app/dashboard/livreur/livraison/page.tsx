@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import Footer from '@/components/Footer'
 
 export default function LivraisonsPage() {
   return (
@@ -18,7 +17,6 @@ export default function LivraisonsPage() {
           </button>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

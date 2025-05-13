@@ -19,6 +19,10 @@ let AnnonceClient = class AnnonceClient {
     poids_estime;
     prix_livraison;
     colis_fragile;
+    type_annonce;
+    magasin;
+    liste_courses;
+    date_course;
     utilisateur;
 };
 exports.AnnonceClient = AnnonceClient;
@@ -46,6 +50,22 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], AnnonceClient.prototype, "colis_fragile", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AnnonceClient.prototype, "type_annonce", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], AnnonceClient.prototype, "magasin", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, type: 'text' }),
+    __metadata("design:type", String)
+], AnnonceClient.prototype, "liste_courses", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Date)
+], AnnonceClient.prototype, "date_course", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => utilisateur_entity_1.Utilisateur, (u) => u.annoncesClient, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'Id_utilisateur' }),

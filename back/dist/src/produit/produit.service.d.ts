@@ -12,4 +12,9 @@ export declare class ProduitService {
     remove(id: number): Promise<import("typeorm").DeleteResult>;
     findOne(id: number): Promise<Produit | null>;
     findByCategorie(categorie: string): Promise<Produit[]>;
+    findFullById(id: number): Promise<{
+        produit: Produit;
+        commentaires: import("../commentaire-produit/commentaire-produit.entity").CommentaireProduit[];
+        similaires: Produit[];
+    } | null>;
 }

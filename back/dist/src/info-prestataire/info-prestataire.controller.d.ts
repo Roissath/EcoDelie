@@ -11,4 +11,5 @@ export declare class InfoPrestataireController {
     valider(id: string): Promise<void>;
     rejeter(id: string): Promise<void>;
     remove(id: string): Promise<import("typeorm").DeleteResult>;
+    findByUtilisateur(id: string): Promise<import("./info-prestataire.entity").InfoPrestataire | null>;
 }

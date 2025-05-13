@@ -9,6 +9,9 @@ class CreateInfoLivreurDto {
     statut;
     appreciation;
     utilisateurId;
+    photo;
+    regions_livraison;
+    villes_livraison;
 }
 exports.CreateInfoLivreurDto = CreateInfoLivreurDto;
 //# sourceMappingURL=create-info-livreur.dto.js.map

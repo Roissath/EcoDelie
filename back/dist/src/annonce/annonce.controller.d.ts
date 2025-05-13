@@ -6,7 +6,9 @@ export declare class AnnonceController {
     constructor(service: AnnonceService);
     create(dto: CreateAnnonceDto): Promise<import("./annonce.entity").Annonce>;
     findAll(): Promise<import("./annonce.entity").Annonce[]>;
-    findOne(id: string): Promise<import("./annonce.entity").Annonce | null>;
-    update(id: string, dto: UpdateAnnonceDto): Promise<import("./annonce.entity").Annonce | null>;
-    remove(id: string): Promise<import("typeorm").DeleteResult>;
+    findOne(id: string): Promise<import("./annonce.entity").Annonce>;
+    update(id: string, dto: UpdateAnnonceDto): Promise<import("./annonce.entity").Annonce>;
+    remove(id: string): Promise<import("./annonce.entity").Annonce>;
+    findByType(type: string): Promise<import("./annonce.entity").Annonce[]>;
+    findClientPrestation(id: string): Promise<import("./annonce.entity").Annonce>;
 }

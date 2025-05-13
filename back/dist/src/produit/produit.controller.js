@@ -46,6 +46,9 @@ let ProduitController = class ProduitController {
     findByCategorie(categorie) {
         return this.produitService.findByCategorie(categorie);
     }
+    async findOneFull(id) {
+        return this.produitService.findFullById(+id);
+    }
 };
 exports.ProduitController = ProduitController;
 __decorate([
@@ -105,6 +108,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProduitController.prototype, "findByCategorie", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ProduitController.prototype, "findOneFull", null);
 exports.ProduitController = ProduitController = __decorate([
     (0, common_1.Controller)('produit'),
     __metadata("design:paramtypes", [produit_service_1.ProduitService])

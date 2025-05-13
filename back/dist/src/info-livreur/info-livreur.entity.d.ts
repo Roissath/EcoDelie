@@ -8,5 +8,8 @@ export declare class InfoLivreur {
     statut: string;
     appreciation: string;
     verifie: boolean;
+    photo?: string;
+    regions_livraison?: string;
+    villes_livraison?: string;
     utilisateur: Utilisateur;
 }

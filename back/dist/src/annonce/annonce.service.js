@@ -18,29 +18,51 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const annonce_entity_1 = require("./annonce.entity");
 let AnnonceService = class AnnonceService {
-    repo;
-    constructor(repo) {
-        this.repo = repo;
-    }
-    findAll() {
-        return this.repo.find({ relations: ['utilisateur', 'paiements', 'colis', 'infoPrestataire'] });
-    }
-    findOne(id) {
-        return this.repo.findOne({ where: { id }, relations: ['utilisateur', 'paiements', 'colis', 'infoPrestataire'] });
+    annonceRepo;
+    constructor(annonceRepo) {
+        this.annonceRepo = annonceRepo;
     }
     create(dto) {
-        const annonce = this.repo.create({
-            ...dto,
-            utilisateur: { id: dto.utilisateurId },
+        const annonce = this.annonceRepo.create(dto);
+        return this.annonceRepo.save(annonce);
+    }
+    findAll() {
+        return this.annonceRepo.find({
+            relations: ['utilisateur'],
         });
-        return this.repo.save(annonce);
+    }
+    async findOne(id) {
+        const annonce = await this.annonceRepo.findOne({
+            where: { id },
+            relations: ['utilisateur'],
+        });
+        if (!annonce)
+            throw new common_1.NotFoundException('Annonce non trouvée');
+        return annonce;
     }
     async update(id, dto) {
-        await this.repo.update(id, dto);
-        return this.findOne(id);
+        const annonce = await this.findOne(id);
+        Object.assign(annonce, dto);
+        return this.annonceRepo.save(annonce);
     }
-    remove(id) {
-        return this.repo.delete(id);
+    async remove(id) {
+        const annonce = await this.findOne(id);
+        return this.annonceRepo.remove(annonce);
+    }
+    async findByType(type) {
+        return this.annonceRepo.find({
+            where: { type_annonce: type },
+            relations: ['utilisateur'],
+        });
+    }
+    async findPrestationWithPrestataire(id) {
+        const annonce = await this.annonceRepo.findOne({
+            where: { id, type_annonce: 'prestation' },
+            relations: ['utilisateur'],
+        });
+        if (!annonce)
+            throw new common_1.NotFoundException('Prestation non trouvée');
+        return annonce;
     }
 };
 exports.AnnonceService = AnnonceService;

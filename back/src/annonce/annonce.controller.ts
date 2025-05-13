@@ -31,4 +31,16 @@ export class AnnonceController {
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
+
+  // 🔍 Ajouter une route pour trouver par type
+  @Get('type/:type')
+  findByType(@Param('type') type: string) {
+    return this.service.findByType(type);
+  }
+
+  // 🔍 Ajouter une route pour retrouver une prestation avec prestataire (pour le chat)
+  @Get('client/prestations/:id')
+  findClientPrestation(@Param('id') id: string) {
+    return this.service.findPrestationWithPrestataire(+id);
+  }
 }

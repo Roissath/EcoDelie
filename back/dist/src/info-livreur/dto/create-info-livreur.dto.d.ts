@@ -6,4 +6,7 @@ export declare class CreateInfoLivreurDto {
     statut: string;
     appreciation?: string;
     utilisateurId: number;
+    photo?: string;
+    regions_livraison?: string;
+    villes_livraison?: string;
 }

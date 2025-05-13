@@ -43,6 +43,9 @@ let InfoPrestataireController = class InfoPrestataireController {
     remove(id) {
         return this.service.remove(+id);
     }
+    findByUtilisateur(id) {
+        return this.service.findByUtilisateurId(+id);
+    }
 };
 exports.InfoPrestataireController = InfoPrestataireController;
 __decorate([
@@ -94,6 +97,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], InfoPrestataireController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('utilisateur/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], InfoPrestataireController.prototype, "findByUtilisateur", null);
 exports.InfoPrestataireController = InfoPrestataireController = __decorate([
     (0, common_1.Controller)('info-prestataire'),
     __metadata("design:paramtypes", [info_prestataire_service_1.InfoPrestataireService])

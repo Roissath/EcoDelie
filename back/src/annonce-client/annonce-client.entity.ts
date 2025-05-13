@@ -26,6 +26,18 @@ export class AnnonceClient {
 
   @Column()
   colis_fragile!: boolean;
+  @Column()
+type_annonce!: 'livraison' | 'course';
+
+@Column({ nullable: true })
+magasin?: string;
+
+@Column({ nullable: true, type: 'text' })
+liste_courses?: string;
+
+@Column({ nullable: true })
+date_course?: Date;
+
 
   @ManyToOne(() => Utilisateur, (u) => u.annoncesClient, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'Id_utilisateur' })

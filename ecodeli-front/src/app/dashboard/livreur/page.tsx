@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PlusCircle, CalendarCheck, FileText, MapPin, CreditCard, FileBarChart2 } from 'lucide-react'
+import { User } from 'lucide-react'
 
 const cards = [
   {
@@ -13,7 +14,7 @@ const cards = [
     href: '/dashboard/livreur/livraison',
   },
   {
-    title: 'Mon planning',
+    title: 'Mon planning ',
     description: 'Gérez vos disponibilités de trajet et horaires de livraison.',
     icon: <CalendarCheck className="w-6 h-6 text-[#19A463]" />,
     href: '/dashboard/livreur/planning',
@@ -42,6 +43,13 @@ const cards = [
     icon: <FileBarChart2 className="w-6 h-6 text-[#19A463]" />,
     href: '/dashboard/livreur/factures',
   },
+  {
+    title: 'Mon profil',
+    description: 'Modifier mes informations personnelles.',
+    icon: <User className="w-6 h-6 text-[#19A463]" />,
+    href: '/dashboard/livreur/profil',
+  },
+  
 ]
 
 export default function DashboardLivreur() {

@@ -37,6 +37,12 @@ let AnnonceController = class AnnonceController {
     remove(id) {
         return this.service.remove(+id);
     }
+    findByType(type) {
+        return this.service.findByType(type);
+    }
+    findClientPrestation(id) {
+        return this.service.findPrestationWithPrestataire(+id);
+    }
 };
 exports.AnnonceController = AnnonceController;
 __decorate([
@@ -74,6 +80,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AnnonceController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('type/:type'),
+    __param(0, (0, common_1.Param)('type')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AnnonceController.prototype, "findByType", null);
+__decorate([
+    (0, common_1.Get)('client/prestations/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AnnonceController.prototype, "findClientPrestation", null);
 exports.AnnonceController = AnnonceController = __decorate([
     (0, common_1.Controller)('annonces'),
     __metadata("design:paramtypes", [annonce_service_1.AnnonceService])

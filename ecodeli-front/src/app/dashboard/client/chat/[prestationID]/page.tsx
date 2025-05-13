@@ -12,35 +12,48 @@ interface Message {
 
 export default function ChatPage() {
   const { prestationId } = useParams()
+  const [clientId, setClientId] = useState<number | null>(null)
+  const [prestataireId, setPrestataireId] = useState<number | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
-  const clientId = 1 // 🔒 à remplacer par user connecté
-  const [prestataireId, setPrestataireId] = useState<number | null>(null)
 
+  // ✅ Récupération utilisateur connecté
   useEffect(() => {
-    // Étape 1 : récupérer les infos prestataire associées à la prestation
-    fetch(`http://localhost:3001/annonces/client/prestations/${prestationId}`)
-      .then(res => res.json())
+    fetch('http://localhost:3001/auth/me', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.id) setClientId(data.id)
+      })
+  }, [])
+
+  // ✅ Récupération de l'ID du prestataire à partir de la prestation
+  useEffect(() => {
+    if (!prestationId) return
+
+    fetch(`http://localhost:3001/annonces/${prestationId}`)
+      .then(res => res.ok ? res.json() : null)
       .then(data => {
         const id = data?.infoPrestataire?.utilisateur?.id
-        setPrestataireId(id)
+        if (id) setPrestataireId(id)
       })
   }, [prestationId])
 
+  // ✅ Charger les messages
   useEffect(() => {
-    if (!prestataireId) return
+    if (!clientId || !prestataireId) return
 
     fetch(`http://localhost:3001/messages/conversation/${clientId}/${prestataireId}`)
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : [])
       .then(setMessages)
-  }, [prestataireId])
+  }, [clientId, prestataireId])
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !prestataireId) return
+    if (!newMessage.trim() || !clientId || !prestataireId) return
 
     const res = await fetch('http://localhost:3001/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         expediteurId: clientId,
         destinataireId: prestataireId,

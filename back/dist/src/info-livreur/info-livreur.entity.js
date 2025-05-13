@@ -21,6 +21,9 @@ let InfoLivreur = class InfoLivreur {
     statut;
     appreciation;
     verifie;
+    photo;
+    regions_livraison;
+    villes_livraison;
     utilisateur;
 };
 exports.InfoLivreur = InfoLivreur;
@@ -56,6 +59,18 @@ __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], InfoLivreur.prototype, "verifie", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], InfoLivreur.prototype, "photo", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], InfoLivreur.prototype, "regions_livraison", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], InfoLivreur.prototype, "villes_livraison", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => utilisateur_entity_1.Utilisateur, (utilisateur) => utilisateur.infoLivreur, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'Id_utilisateur' }),

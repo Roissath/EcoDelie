@@ -7,6 +7,10 @@ class CreateAnnonceClientDto {
     poids_estime;
     prix_livraison;
     colis_fragile;
+    type_annonce;
+    magasin;
+    liste_courses;
+    date_course;
     utilisateurId;
 }
 exports.CreateAnnonceClientDto = CreateAnnonceClientDto;

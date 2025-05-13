@@ -66,5 +66,10 @@ findByCategorie(@Param('categorie') categorie: string) {
   return this.produitService.findByCategorie(categorie);
 }
 
+@Get(':id')
+async findOneFull(@Param('id') id: number) {
+  return this.produitService.findFullById(+id);
+}
+
 
 }

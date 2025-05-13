@@ -41,4 +41,10 @@ export class InfoPrestataireController {
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
+
+  @Get('utilisateur/:id')
+findByUtilisateur(@Param('id') id: string) {
+  return this.service.findByUtilisateurId(+id);
+}
+
 }

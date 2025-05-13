@@ -46,4 +46,15 @@ export class InfoPrestataireService {
   remove(id: number) {
     return this.repo.delete(id);
   }
+ 
+  async findByUtilisateurId(utilisateurId: number) {
+    return this.repo.findOne({
+      where: {
+        utilisateur: { id: utilisateurId },
+      },
+      relations: ['utilisateur', 'annonce', 'contract'],
+    });
+  }
+  
+
 }

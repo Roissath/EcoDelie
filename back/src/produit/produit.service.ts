@@ -67,5 +67,28 @@ export class ProduitService {
       relations: ['utilisateur'],
     });
   }
+
+
+  async findFullById(id: number) {
+    const produit = await this.repo.findOne({
+      where: { id },
+      relations: ['utilisateur', 'commentaires'],
+    });
+  
+    if (!produit) return null;
+  
+    const similaires = await this.repo.find({
+      where: { categorie: produit.categorie },
+      relations: ['utilisateur'],
+      take: 6,
+    });
+  
+    return {
+      produit,
+      commentaires: produit.commentaires,
+      similaires: similaires.filter(p => p.id !== produit.id),
+    };
+  }
+  
   
 }

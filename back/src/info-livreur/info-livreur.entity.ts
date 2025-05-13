@@ -32,6 +32,16 @@ export class InfoLivreur {
 
   @Column({ default: false })
   verifie!: boolean; // validé par l'admin après réception des documents
+  
+  @Column({ nullable: true })
+photo?: string;
+
+@Column({ nullable: true })
+regions_livraison?: string;
+
+@Column({ nullable: true })
+villes_livraison?: string;
+
 
   @OneToOne(() => Utilisateur, (utilisateur) => utilisateur.infoLivreur, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'Id_utilisateur' })

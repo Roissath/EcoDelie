@@ -1,176 +1,110 @@
-// 'use client'
-
-// import { useEffect, useState } from 'react'
-// import { useParams } from 'next/navigation'
-// import { getUserFromCookie } from '@/lib/auth'
-// import Image from 'next/image'
-
-// interface Message {
-//   id: number
-//   contenu: string
-//   date_envoi: string
-//   lu: boolean
-//   expediteur: { id: number; nom: string }
-//   destinataire: { id: number; nom: string }
-// }
-
-// export default function ChatPrestation() {
-//   const { id: prestataireId } = useParams()
-//   const [userId, setUserId] = useState<number | null>(null)
-//   const [messages, setMessages] = useState<Message[]>([])
-//   const [newMessage, setNewMessage] = useState('')
-
-//   // Récupération de l'utilisateur connecté
-//   useEffect(() => {
-//     const fetchUser = async () => {
-//       const user = await getUserFromCookie()
-//       setUserId(user?.id || null)
-//     }
-//     fetchUser()
-//   }, [])
-
-//   // Récupération des messages
-//   useEffect(() => {
-//     if (!userId || !prestataireId) return
-
-//     fetch(`http://localhost:3000/messages/conversation/${userId}/${prestataireId}`)
-//       .then((res) => res.json())
-//       .then(setMessages)
-//   }, [userId, prestataireId])
-
-//   // Envoi du message
-//   const sendMessage = async () => {
-//     if (!newMessage || !userId || !prestataireId) return
-
-//     const messageToSend = {
-//       contenu: newMessage,
-//       date_envoi: new Date(),
-//       lu: false,
-//       expediteurId: userId,
-//       destinataireId: Number(prestataireId),
-//     }
-
-//     const res = await fetch('http://localhost:3000/messages', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(messageToSend),
-//     })
-
-//     const saved = await res.json()
-//     setMessages((prev) => [...prev, saved])
-//     setNewMessage('')
-//   }
-
-//   return (
-//     <div className="p-6 max-w-3xl mx-auto">
-//       <h1 className="text-2xl font-bold mb-4">Discussion avec le prestataire</h1>
-
-//       <div className="h-[400px] overflow-y-auto border p-4 rounded-xl bg-white shadow-sm">
-//         {messages.map((msg) => (
-//           <div
-//             key={msg.id}
-//             className={`mb-3 p-2 rounded-md max-w-[70%] ${
-//               msg.expediteur.id === userId
-//                 ? 'bg-blue-100 self-end ml-auto text-right'
-//                 : 'bg-gray-100 self-start'
-//             }`}
-//           >
-//             <p className="text-sm text-gray-800">{msg.contenu}</p>
-//             <p className="text-xs text-gray-500">{new Date(msg.date_envoi).toLocaleString()}</p>
-//           </div>
-//         ))}
-//       </div>
-
-//       <div className="mt-4 flex gap-2">
-//         <input
-//           type="text"
-//           value={newMessage}
-//           onChange={(e) => setNewMessage(e.target.value)}
-//           className="flex-1 border rounded-xl p-2"
-//           placeholder="Écrire un message..."
-//         />
-//         <button
-//           onClick={sendMessage}
-//           className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
-//         >
-//           Envoyer
-//         </button>
-//       </div>
-//     </div>
-//   )
-// }
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-interface Utilisateur {
-  id: number
-  prenom: string
-  nom: string
-  email: string
-}
-
-interface Annonce {
+interface Prestation {
   id: number
   titre: string
   description: string
   date_publication: string
   statut: string
-  utilisateur: Utilisateur
+  utilisateur: {
+    id: number
+    nom: string
+    prenom: string
+  }
+  type_annonce: string
 }
 
 export default function DetailPrestationPage() {
   const { id } = useParams()
   const router = useRouter()
-  const [prestation, setPrestation] = useState<Annonce | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [prestation, setPrestation] = useState<Prestation | null>(null)
+  const [similaires, setSimilaires] = useState<Prestation[]>([])
 
   useEffect(() => {
     fetch(`http://localhost:3001/annonces/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setPrestation(data)
-        setLoading(false)
-      })
-      .catch((err) => {
-        console.error('Erreur lors du chargement de la prestation :', err)
-        setLoading(false)
+        if (data.type_annonce) {
+          fetch(`http://localhost:3001/annonces/type/${data.type_annonce}`)
+            .then(res => res.json())
+            .then(list => {
+              setSimilaires(list.filter((a: Prestation) => a.id !== data.id))
+            })
+        }
       })
   }, [id])
 
-  const handleAccepter = async () => {
-    // Exemple d’action d’acceptation (à adapter à ton backend)
-    alert('Fonction d’acceptation à implémenter ici.')
+  const accepterPrestation = async () => {
+    const res = await fetch(`http://localhost:3001/annonce-client`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ annonceId: prestation?.id })
+    })
+    if (res.ok) {
+      alert('Prestation acceptée.')
+      router.push('/dashboard/client/prestations')
+    } else {
+      alert('Erreur lors de l’acceptation.')
+    }
   }
 
-  if (loading) return <div className="p-6">Chargement...</div>
-  if (!prestation) return <div className="p-6 text-red-600">Aucune prestation trouvée.</div>
+  if (!prestation) return <div className="p-6 text-center text-gray-500">Chargement en cours...</div>
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">{prestation.titre}</h1>
-      <p className="text-gray-700">{prestation.description}</p>
-      <p className="text-sm text-gray-500">
-        Publié le {new Date(prestation.date_publication).toLocaleDateString('fr-FR')} par {prestation.utilisateur.prenom} {prestation.utilisateur.nom}
-      </p>
+    <div className="p-6 max-w-5xl mx-auto space-y-10">
+      {/* Prestation en détail */}
+      <div className="bg-white rounded-2xl shadow-lg p-8 space-y-4">
+        <h1 className="text-3xl font-bold text-blue-700">{prestation.titre}</h1>
+        <p className="text-gray-700 leading-relaxed">{prestation.description}</p>
+        <div className="text-sm text-gray-500">
+          Publiée le <span className="font-medium">{new Date(prestation.date_publication).toLocaleDateString()}</span>
+          {' '}• Statut : <span className="capitalize font-medium">{prestation.statut}</span>
+        </div>
+        <div className="text-gray-600">
+          Proposée par : <span className="font-semibold">{prestation.utilisateur.prenom} {prestation.utilisateur.nom}</span>
+        </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-6">
-        <button
-          onClick={handleAccepter}
-          className="bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700 transition"
-        >
-          Accepter la prestation
-        </button>
-
-        <Link
-          href={`/dashboard/client/chat/${prestation.id}`}
-          className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-800 transition text-center"
-        >
-          Discuter avec le prestataire
-        </Link>
+        <div className="flex flex-wrap gap-4 mt-6">
+          <button
+            onClick={accepterPrestation}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl transition font-medium"
+          >
+            ✅ Accepter la prestation
+          </button>
+          <Link
+            href={`/dashboard/client/chat/${prestation.id}`}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition font-medium"
+          >
+            💬 Discuter avec le prestataire
+          </Link>
+        </div>
       </div>
+
+      {/* Prestations similaires */}
+      {similaires.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-800">Prestations similaires</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {similaires.slice(0, 6).map((p) => (
+              <Link
+                key={p.id}
+                href={`/dashboard/client/prestations/${p.id}`}
+                className="bg-white shadow-sm hover:shadow-md transition rounded-xl p-5 block border border-gray-100"
+              >
+                <h3 className="text-lg font-bold text-gray-800 mb-2">{p.titre}</h3>
+                <p className="text-sm text-gray-600 line-clamp-3">{p.description}</p>
+                <p className="text-xs text-gray-400 mt-3">Par {p.utilisateur.prenom} {p.utilisateur.nom}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

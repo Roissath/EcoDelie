@@ -1,105 +1,126 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import { MapPin, Truck, Clock, Trash2, Pencil } from 'lucide-react'
 
-interface LivraisonDetail {
+interface Livraison {
   id: number
-  date_livraison: string
-  adresse: string
   statut: string
-  commande?: {
+  date_debut: string
+  date_fin?: string
+  livreur: { nom: string; prenom: string }
+  annonceClient: {
     id: number
-    prix_unitaire: number
-    date_commande: string
-    statut: string
-  }
-  client?: {
-    nom: string
-    prenom: string
-    adresse: string
-  }
-  livreur?: {
-    nom: string
-    prenom: string
+    lieu_depart: string
+    lieu_arrivee: string
+    prix_livraison: number
+    colis_fragile: boolean
+    type_annonce: string
   }
 }
 
-export default function LivraisonDetailPage() {
+export default function DetailLivraisonClient() {
   const { id } = useParams()
-  const [livraison, setLivraison] = useState<LivraisonDetail | null>(null)
+  const router = useRouter()
+  const [livraison, setLivraison] = useState<Livraison | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/livraison/${id}`, {
-      credentials: 'include',
+    if (!id) return
+
+    fetch(`http://localhost:3001/livraison/${id}`, {
+      credentials: 'include'
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setLivraison(data)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setLivraison(data)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch(err => {
+        console.error(err)
+        setLoading(false)
+      })
   }, [id])
 
-  if (loading) return <div className="text-center py-10 text-lg">Chargement...</div>
-  if (!livraison) return <div className="text-center py-10 text-red-600">Aucune information trouvée.</div>
+  if (loading) return <p className="p-6">Chargement...</p>
+  if (!livraison) return <p className="p-6 text-red-600">Livraison introuvable.</p>
+
+  const { annonceClient, livreur, statut, date_debut, date_fin } = livraison
+
+  const handleSupprimer = async () => {
+    const confirm = window.confirm('Annuler cette annonce ?')
+    if (!confirm) return
+    const res = await fetch(`http://localhost:3001/annonces-client/${annonceClient.id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+    if (res.ok) {
+      alert('Annonce annulée.')
+      router.push('/dashboard/client/annonces')
+    } else {
+      alert('Erreur lors de la suppression.')
+    }
+  }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Détails de la Livraison #{livraison.id}</h1>
+    <div className="min-h-screen bg-[#FAFAFA] p-6 max-w-4xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold text-[#0070C0] mb-4">Suivi de livraison #{livraison.id}</h1>
 
-      <div className="bg-white rounded-xl shadow p-6 border space-y-4">
-        <div>
-          <p className="text-gray-500 text-sm">Date prévue :</p>
-          <p className="text-lg font-medium">{new Date(livraison.date_livraison).toLocaleDateString()}</p>
+      <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="flex items-center gap-3 text-sm text-gray-600">
+          <Truck className="text-[#0070C0]" />
+          <span>Statut : <strong className="capitalize">{statut}</strong></span>
         </div>
 
-        <div>
-          <p className="text-gray-500 text-sm">Adresse de livraison :</p>
-          <p className="text-lg font-medium">{livraison.adresse}</p>
+        <div className="flex items-center gap-3 text-sm text-gray-600">
+          <Clock className="text-[#0070C0]" />
+          <span>Début : {new Date(date_debut).toLocaleString()}</span>
         </div>
 
-        <div>
-          <p className="text-gray-500 text-sm">Statut :</p>
-          <span
-            className={`text-sm px-3 py-1 rounded-full inline-block ${
-              livraison.statut === 'livrée'
-                ? 'bg-green-100 text-green-700'
-                : livraison.statut === 'en cours'
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            {livraison.statut}
-          </span>
-        </div>
-
-        {livraison.commande && (
-          <div className="pt-4 border-t">
-            <h2 className="font-semibold mb-1">Commande liée :</h2>
-            <p>ID : #{livraison.commande.id}</p>
-            <p>Prix : {livraison.commande.prix_unitaire} €</p>
-            <p>Passée le : {new Date(livraison.commande.date_commande).toLocaleDateString()}</p>
-            <p>Statut de la commande : {livraison.commande.statut}</p>
+        {date_fin && (
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            <Clock className="text-[#0070C0]" />
+            <span>Livrée le : {new Date(date_fin).toLocaleString()}</span>
           </div>
         )}
 
-        {livraison.livreur && (
-          <div className="pt-4 border-t">
-            <h2 className="font-semibold mb-1">Livreur assigné :</h2>
-            <p>{livraison.livreur.prenom} {livraison.livreur.nom}</p>
+        <div className="flex items-center gap-3 text-sm text-gray-600">
+          <MapPin className="text-[#0070C0]" />
+          <span>Départ : {annonceClient.lieu_depart}</span>
+        </div>
+
+        <div className="flex items-center gap-3 text-sm text-gray-600">
+          <MapPin className="text-[#0070C0]" />
+          <span>Arrivée : {annonceClient.lieu_arrivee}</span>
+        </div>
+
+        <p className="text-sm text-gray-700">Colis fragile : {annonceClient.colis_fragile ? 'Oui' : 'Non'}</p>
+        <p className="text-sm text-gray-700">Type d’annonce : {annonceClient.type_annonce}</p>
+        <p className="text-sm text-gray-700">Montant payé : {annonceClient.prix_livraison.toFixed(2)} €</p>
+
+        <hr className="my-4" />
+
+        <p className="text-sm text-gray-600">Livreur : <strong>{livreur.prenom} {livreur.nom}</strong></p>
+
+        {/* Boutons d’action */}
+        {statut === 'en_attente' && (
+          <div className="flex gap-4 mt-4">
+            <button
+              onClick={handleSupprimer}
+              className="flex items-center gap-2 text-red-600 hover:underline"
+            >
+              <Trash2 className="w-4 h-4" /> Annuler l’annonce
+            </button>
+            <a
+              href={`/dashboard/client/annonces/modifier/${annonceClient.id}`}
+              className="flex items-center gap-2 text-blue-600 hover:underline"
+            >
+              <Pencil className="w-4 h-4" /> Modifier
+            </a>
           </div>
         )}
       </div>
-
-      <Link
-        href="/dashboard/client/livraisons"
-        className="mt-6 inline-block text-blue-600 hover:underline text-sm"
-      >
-        ← Retour à mes livraisons
-      </Link>
     </div>
   )
 }
