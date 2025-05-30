@@ -1,0 +1,40 @@
+import { Repository } from 'typeorm';
+import { Utilisateur } from '../utilisateur/utilisateur.entity';
+import { AnnonceClient } from '../annonce-client/annonce-client.entity';
+import { Produit } from '../produit/produit.entity';
+import { Livraison } from '../livraison/livraison.entity';
+import { Colis } from '../colis/colis.entity';
+import { Stokage } from '../stokage/stokage.entity';
+import { Message } from '../message/message.entity';
+import { Notification } from '../notification/notification.entity';
+import { Document } from '../document/document.entity';
+import { Commande } from '../commande/commande.entity';
+export declare class StatsService {
+    private utilisateurRepo;
+    private annonceClientRepo;
+    private produitRepo;
+    private livraisonRepo;
+    private colisRepo;
+    private stokageRepo;
+    private messageRepo;
+    private notificationRepo;
+    private documentRepo;
+    private commandeRepo;
+    constructor(utilisateurRepo: Repository<Utilisateur>, annonceClientRepo: Repository<AnnonceClient>, produitRepo: Repository<Produit>, livraisonRepo: Repository<Livraison>, colisRepo: Repository<Colis>, stokageRepo: Repository<Stokage>, messageRepo: Repository<Message>, notificationRepo: Repository<Notification>, documentRepo: Repository<Document>, commandeRepo: Repository<Commande>);
+    getDashboardStats(filters: any): Promise<{
+        utilisateursParType: any[];
+        totalAnnonces: number;
+        totalPrestataires: number;
+        totalProduits: number;
+        totalLivraisons: number;
+        totalColis: number;
+        totalStokages: number;
+        totalNotifications: number;
+        totalDocuments: number;
+        totalCommandes: number;
+        topUtilisateurs: any;
+        timelineInscriptions: any;
+    }>;
+    countByRole(): Promise<any[]>;
+    countAnnonces(): Promise<any[]>;
+}

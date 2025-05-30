@@ -1,11 +1,6 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsEmail,
-  IsDateString,
-  IsNumber,
-} from 'class-validator';
+// src/auth/dto/register-auth.dto.ts
+import { IsString, IsNotEmpty, IsOptional, IsEmail, IsDateString, IsNumber } from 'class-validator'
+import { Role } from 'src/enums/role.enum'
 
 export class RegisterAuthDto {
   @IsString()
@@ -49,5 +44,23 @@ export class RegisterAuthDto {
 
   @IsString()
   @IsNotEmpty()
-  type!: string; // ex : client, admin...
+  type!: Role;
+
+  // Champs spécifiques pour livreur
+  @IsOptional()
+  type_permis?: string;
+  @IsOptional()
+  zones_livraison?: string;
+  @IsOptional()
+  type_transport?: string;
+  @IsOptional()
+  moyen_paiement?: string;
+
+  // Champs spécifiques pour prestataire
+  @IsOptional()
+  types_services?: string;
+  @IsOptional()
+  tarif_prestation?: number;
+
+  // (Si tu veux : ajoute les autres champs facultatifs pour client/commerçant)
 }

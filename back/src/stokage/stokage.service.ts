@@ -36,4 +36,5 @@ export class StokageService {
   remove(id: number) {
     return this.repo.delete(id);
   }
+  
 }

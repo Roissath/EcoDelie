@@ -13,17 +13,35 @@ export class AnnonceClientService {
   ) {}
 
   findAll() {
-    return this.repo.find({ relations: ['utilisateur'] });
+    return this.repo.find({
+      relations: [
+        'utilisateur',
+        'livreurs',
+        'livreurs.utilisateur',
+      ],
+      order: { datePublication: 'DESC' }, // tri facultatif
+    });
   }
 
-  findOne(id: number) {
-    return this.repo.findOne({ where: { id }, relations: ['utilisateur'] });
+  findOne(id: number)
+   {
+    if (!id || isNaN(id)) throw new Error('ID invalide');
+    return this.repo.findOne({
+      where: { id },
+      relations: [
+        'utilisateur',
+        'livreurs',
+        'livreurs.utilisateur',
+      ],
+    })
   }
+  
 
   create(dto: CreateAnnonceClientDto) {
     const annonce = this.repo.create({
       ...dto,
       utilisateur: { id: dto.utilisateurId },
+      datePublication: new Date(),
     });
     return this.repo.save(annonce);
   }
@@ -36,4 +54,6 @@ export class AnnonceClientService {
   remove(id: number) {
     return this.repo.delete(id);
   }
+
+  
 }

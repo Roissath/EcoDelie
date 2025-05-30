@@ -18,12 +18,13 @@ import { UtilisateurService } from '../utilisateur/utilisateur.service';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { Param } from '@nestjs/common';
-
+import { MailService } from 'src/mail/mail.service';
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-      private readonly utilisateurService: UtilisateurService,){}
+      private readonly utilisateurService: UtilisateurService,
+      private readonly mailService: MailService,){}
 
   @Post('register')
   async register(
@@ -33,7 +34,7 @@ export class AuthController {
     const { access_token, user } = await this.authService.register(dto);
     res.cookie('jwt', access_token, {
       httpOnly: true,
-      secure: false, // ✅ passe à true en production avec HTTPS
+      secure: false, //  passe à true en production avec HTTPS
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
     });
@@ -43,25 +44,32 @@ export class AuthController {
   @Post('login')
 async login(
   @Body() dto: LoginAuthDto,
-  @Res({ passthrough: true }) res: Response, // ← important
+  @Res({ passthrough: true }) res: Response,
 ) {
   const { access_token, user } = await this.authService.login(dto);
+
   res.cookie('jwt', access_token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: false, // ← passe à true si HTTPS
+    secure: false,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-  return user;
+
+  return {
+    message: 'Connexion réussie',
+    user, // ← assure-toi que ceci est bien "admin"
+  };
 }
 
 
+@Get('me')
+@UseGuards(JwtAuthGuard)
+async getMe(@Req() req: Request) {
+  console.log("USER JWT PAYLOAD :", req['user']) // ← vérifie ici dans le terminal
+  const utilisateur = req['user'];
+  return this.authService.getProfilSelonRole(utilisateur);
+}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async me(@Req() req: Request) {
-    return this.authService.me(req.user);
-  }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
@@ -90,20 +98,19 @@ async forgotPassword(@Body('email') email: string) {
   await this.utilisateurService.update(user.id, user);
 
   const resetLink = `http://localhost:3000/reset-password/${token}`;
-  console.log('Lien de réinitialisation :', resetLink);
+await this.mailService.sendPasswordResetEmail(user.email, token);
 
   return { message: 'Si cet email existe, un lien a été envoyé.' };
 }
 
 
 @Post('reset-password/:token')
-async resetPassword(
-  @Param('token') token: string,
-  @Body() body: { password: string; confirmPassword: string }
-) {
-  return this.authService.resetPassword(token, body.password, body.confirmPassword);
-}
-
-
+  async resetPassword(
+    @Param('token') token: string,
+    @Body('password') password: string,
+    @Body('confirmPassword') confirmPassword: string,
+  ) {
+    return this.authService.resetPassword(token, password, confirmPassword);
+  }
 
 }

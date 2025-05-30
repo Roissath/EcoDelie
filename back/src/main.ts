@@ -5,7 +5,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { join } from 'path';
+import { resolve } from 'path';
+
 import { existsSync, mkdirSync } from 'fs';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 async function bootstrap() {
   const facturesDir = join(__dirname, '..', 'public', 'factures');
@@ -32,9 +36,9 @@ async function bootstrap() {
   );
 
   //  Sert les PDF via http://localhost:3001/factures/xxx.pdf
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
-    prefix: '/',
-  });
+app.useStaticAssets(resolve('./uploads'), {
+  prefix: '/uploads',
+});
 
   await app.listen(3001);
   console.log('✅ Serveur NestJS démarré sur http://localhost:3001');

@@ -43,4 +43,10 @@ export class AnnonceController {
   findClientPrestation(@Param('id') id: string) {
     return this.service.findPrestationWithPrestataire(+id);
   }
+
+  // 🔍 Toutes les prestations visibles publiquement (client)
+  @Get('public/prestations')
+  findPublicPrestations() {
+    return this.service.findAllPublicPrestations();
+  }
 }

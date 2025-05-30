@@ -10,7 +10,8 @@ import {
   import { InfoPrestataire } from '../info-prestataire/info-prestataire.entity';
   import { Paiement } from '../paiement/paiement.entity';
   import { Colis } from '../colis/colis.entity';
-  
+  import { Commande } from '../commande/commande.entity';
+
   @Entity()
   export class Annonce {
     @PrimaryGeneratedColumn({ name: 'Id_annonce' })

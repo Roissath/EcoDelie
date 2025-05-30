@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 export class CreateDocumentDto {
   @IsString()
   @IsNotEmpty()
-  type!: string;
+  type_document!: string;
 
   @IsString()
   @IsNotEmpty()

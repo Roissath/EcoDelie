@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { StatsModule } from './stats/stats.module'
 
 import { UtilisateurModule } from './utilisateur/utilisateur.module';
 import { InfoClientModule } from './info-client/info-client.module';
@@ -35,6 +40,9 @@ import { InfoClientController } from './info-client/info-client.controller';
 import { InfoLivreurController } from './info-livreur/info-livreur.controller';
 import { AdminModule } from './admin/admin.module';
 import { ContractModule } from './contract/contract.module';
+
+
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -48,7 +56,37 @@ import { ContractModule } from './contract/contract.module';
       autoLoadEntities: true,
       synchronize: true, // Cela modifie ta base à chaque lancement
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'tonemail@gmail.com',
+          pass: 'motdepasseoumotdepasseapplication',
+        },
+      },
+      defaults: {
+        from: '"EcoDeli" <tonemail@gmail.com>',
+      },
+      template: {
+        dir: __dirname + '/templates',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+     MulterModule.register({
+      dest: './uploads',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     AdminModule,
+    MailerModule,
+    StatsModule,
     DocumentModule,
     AuthModule, // ← ce module doit être présent
     UtilisateurModule,
@@ -82,4 +120,5 @@ import { ContractModule } from './contract/contract.module';
   ],
   providers: [AppService],
 })
+
 export class AppModule {}

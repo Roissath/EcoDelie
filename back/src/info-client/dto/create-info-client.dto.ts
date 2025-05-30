@@ -6,4 +6,7 @@ export class CreateInfoClientDto {
   descriptif_profil?: string;
   age?: number;
   utilisateurId!: number;
+  adresse?: string;
+  statut?: string;
+
 }

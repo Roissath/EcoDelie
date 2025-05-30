@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { Facture } from './facture.entity';
 import { CreateFactureDto } from './dto/create-facture.dto';
 import { UpdateFactureDto } from './dto/update-facture.dto';
-import * as PDFDocument from 'pdfkit';
 import { writeFileSync, createWriteStream } from 'fs';
 import { join } from 'path';
+import PDFDocument from 'pdfkit';
 
 @Injectable()
 export class FactureService {

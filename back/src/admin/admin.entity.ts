@@ -18,6 +18,11 @@ export class Admin {
   @Column()
   statut!: string;
 
+  
+  @Column()
+  mot_de_passe!: string;
+
+
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 

@@ -29,12 +29,8 @@ export class DocumentService {
   
 
   create(dto: CreateDocumentDto) {
-    const entity = this.repo.create({
-      ...dto,
-      utilisateur: { id: dto.utilisateurId },
-    });
-
-    return this.repo.save(entity);
+    const doc = this.repo.create(dto);
+    return this.repo.save(doc);
   }
 
   async update(id: number, dto: UpdateDocumentDto) {

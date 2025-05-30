@@ -24,6 +24,10 @@ export class InfoClient {
   @Column({ nullable: true })
   appreciation?: string;
 
+  @Column({ default: 'en_attente' })
+statut?: string;
+
+
   @Column({ nullable: true })
   descriptif_profil?: string;
 
@@ -33,4 +37,5 @@ export class InfoClient {
   @OneToOne(() => Utilisateur, (u) => u.infoClient, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'utilisateurId' })
   utilisateur!: Utilisateur;
+  
 }

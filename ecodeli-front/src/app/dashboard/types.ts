@@ -230,3 +230,28 @@ export interface CreateAbonnementDto {
     type: string;
   }
   
+  interface Utilisateur {
+    nom: string
+    prenom: string
+  }
+  
+  interface InfoLivreur {
+    utilisateur: Utilisateur
+    type_transport: string
+  }
+  
+  interface AnnonceClient {
+    id: number
+    type_annonce: string
+    liste_courses?: string
+    description?: string
+    statut: string
+    datePublication: string
+    datePriseEnCharge?: string
+    dateLivraison?: string
+    lieu_depart: string
+    lieu_arrivee: string
+    utilisateur: Utilisateur
+    livreurs: InfoLivreur[]
+  }
+  

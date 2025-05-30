@@ -19,7 +19,10 @@ import { Request,Response } from 'express';
 @Controller('paiements')
 export class PaiementController {
   constructor(private readonly service: PaiementService) {}
-
+  @Get(':id/facture/public') 
+  generateFacturePublic(@Param('id') id: string, @Res() res: Response) {
+    return this.service.generateFacture(+id, res);
+  }
   @Post()
   create(@Body() dto: CreatePaiementDto) {
     return this.service.create(dto);
@@ -56,4 +59,6 @@ export class PaiementController {
 generateFacture(@Param('id') id: string, @Res() res: Response) {
   return this.service.generateFacture(+id, res);
 }
+
+
 }

@@ -5,28 +5,54 @@ import { UtilisateurService } from '../utilisateur/utilisateur.service';
 import { RegisterAuthDto } from './dto/register-auth.dto.ts';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { Role } from 'src/enums/role.enum';
+import { AdminService } from 'src/admin/admin.service';
+import { InfoClientService } from 'src/info-client/info-client.service';
+import { InfoLivreurService } from 'src/info-livreur/info-livreur.service';
+import { InfoCommercantService } from 'src/info-commercant/info-commercant.service';
+import { InfoPrestataireService } from 'src/info-prestataire/info-prestataire.service';
+import { Utilisateur } from 'src/utilisateur/utilisateur.entity';
+import { MailService } from 'src/mail/mail.service';
+import { type } from 'os';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly utilisateurService: UtilisateurService,
     private readonly jwtService: JwtService,
+    private readonly adminService: AdminService,
+    private readonly infoClientService: InfoClientService,
+    private readonly infoLivreurService: InfoLivreurService,
+    private readonly infoCommercantService: InfoCommercantService,
+    private readonly infoPrestataireService: InfoPrestataireService,
+    private readonly mailService: MailService,
   ) {}
+  
 
   async register(dto: RegisterAuthDto) {
     const existingUser = await this.utilisateurService.findByEmail(dto.email);
     if (existingUser) {
       throw new ConflictException('Cet email est déjà utilisé');
     }
-
+  
     const hashedPassword = await bcrypt.hash(dto.mot_de_passe, 10);
-    const user = await this.utilisateurService.create({
-      ...dto,
-      type: dto.type as Role,
-      mot_de_passe: hashedPassword,
-    });
+  
+    
+    const parsedDto = {
+  ...dto,
+  tarif_prestation: dto.tarif_prestation ? Number(dto.tarif_prestation) : undefined,
+  age: dto.age ? Number(dto.age) : undefined,
+  type: dto.type as Role,
+  mot_de_passe: hashedPassword,
+};
+
+const user = await this.utilisateurService.create(parsedDto);
+
+  
+await this.mailService.sendWelcomeEmail(user.email, user.nom);
+  
     return this.buildToken(user);
   }
+  
 
   async login(dto: LoginAuthDto) {
     const user = await this.utilisateurService.findByEmail(dto.email);
@@ -42,13 +68,14 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.type,
+      type: user.type, // <- Ce champ doit bien être là
     };
-
+  
     const access_token = this.jwtService.sign(payload);
-
     return { access_token, user };
   }
+  
+  
 
   async me(payload: any) {
     return this.utilisateurService.findOne(payload.sub);
@@ -57,7 +84,9 @@ export class AuthService {
   async getMe(id: number) {
     return this.utilisateurService.findOne(id);
   }
+   
 
+ 
   async changePassword(userPayload: any, oldPassword: string, newPassword: string) {
     const user = await this.utilisateurService.findOne(userPayload.id);
 
@@ -98,5 +127,41 @@ export class AuthService {
     await this.utilisateurService.update(user.id, user);
     return { message: "Mot de passe mis à jour avec succès" };
   }  
+
+  async getProfilSelonRole(utilisateur: Utilisateur) {
+  const user = await this.utilisateurService.findOne(utilisateur.id);
+  if (!user) {
+    throw new UnauthorizedException('Utilisateur introuvable');
+  }
+
+  switch (user.type) {
+    case Role.Admin: {
+      const profil = await this.adminService.findByUtilisateurId(user.id);
+      return profil ?? user;
+    }
+    case Role.Client: {
+      const profil = await this.infoClientService.findByUtilisateurId(user.id);
+      return profil ?? user;
+    }
+    case Role.Livreur: {
+      const profil = await this.infoLivreurService.findByUtilisateurId(user.id);
+      return profil ?? user;
+    }
+    case Role.Commercant: {
+      const profil = await this.infoCommercantService.findByUtilisateurId(user.id);
+      return profil ?? user;
+    }
+    case Role.Prestataire: {
+      const profil = await this.infoPrestataireService.findByUtilisateurId(user.id);
+      return profil ?? user;
+    }
+    default:
+      return user;
+  }
+}
+
+  
+  
+  
   
 }

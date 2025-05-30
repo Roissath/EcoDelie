@@ -60,5 +60,13 @@ export class AnnonceService {
     return annonce;
   }
   
-  
+  // 🔍 Trouver toutes les prestations publiques
+findAllPublicPrestations() {
+  return this.annonceRepo.find({
+    where: { type_annonce: 'prestation' },
+    relations: ['utilisateur', 'infoPrestataire'],
+    order: { date_publication: 'DESC' }
+  });
+}
+
 }

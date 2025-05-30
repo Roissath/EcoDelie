@@ -3,16 +3,30 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { getUserProfile } from '@/lib/auth'
 
 export default function Hero() {
+  const [isConnected, setIsConnected] = useState(false)
+  const [userType, setUserType] = useState('')
+
+  useEffect(() => {
+    getUserProfile().then((user) => {
+      if (user) {
+        setIsConnected(true)
+        setUserType(user.type)
+      }
+    })
+  }, [])
+
   return (
     <section className="w-full bg-gradient-to-b from-green-50 to-green-100 py-20 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
         {/* Texte d'accroche */}
-        <motion.div 
-          initial={{ opacity: 0, x: -50 }} 
-          animate={{ opacity: 1, x: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           className="space-y-6"
         >
@@ -20,26 +34,38 @@ export default function Hero() {
             EcoDeli, la livraison humaine et durable 🌍
           </h1>
           <p className="text-gray-700 text-lg max-w-xl">
-            Une nouvelle façon d'envoyer, recevoir et aider, en connectant voyageurs, commerçants et particuliers dans un esprit d'entraide et d'écologie.
+            Une nouvelle façon d'envoyer, recevoir et aider, en connectant voyageurs,
+            commerçants et particuliers dans un esprit d'entraide et d'écologie.
           </p>
-          <div className="flex gap-4">
-            <Link href="/register">
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition">
-                Créer un compte
-              </button>
-            </Link>
-            <Link href="/livreur/devenir">
-              <button className="border border-green-600 text-green-700 hover:bg-green-100 px-6 py-3 rounded-xl font-semibold transition">
-                Devenir livreur
-              </button>
-            </Link>
-          </div>
+
+          {!isConnected ? (
+            <div className="flex gap-4">
+              <Link href="/register">
+                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+                  Créer un compte
+                </button>
+              </Link>
+              <Link href="/livreur/devenir">
+                <button className="border border-green-600 text-green-700 hover:bg-green-100 px-6 py-3 rounded-xl font-semibold transition">
+                  Devenir livreur
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex gap-4">
+              <Link href={`/dashboard/${userType}`}>
+                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+                  Mon espace
+                </button>
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* Illustration immersive */}
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }} 
-          animate={{ opacity: 1, x: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           className="flex justify-center"
         >

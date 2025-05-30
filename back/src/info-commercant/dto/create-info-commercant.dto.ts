@@ -1,7 +1,8 @@
 export class CreateInfoCommercantDto {
-  status!: string;
-  adresse!: string;
+  statut?: string;
+  adresse?: string;
   appreciation?: string;
   utilisateurId!: number;
   contractId?: number;
+  
 }

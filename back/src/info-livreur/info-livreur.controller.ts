@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UseGuards
+} from '@nestjs/common';
 import { InfoLivreurService } from './info-livreur.service';
 import { CreateInfoLivreurDto } from './dto/create-info-livreur.dto';
 import { UpdateInfoLivreurDto } from './dto/update-info-livreur.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('info-livreur')
 export class InfoLivreurController {
@@ -40,5 +52,21 @@ export class InfoLivreurController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
+  }
+
+  // ✅ Récupérer les infos du livreur connecté
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMyInfo(@Req() req: Request) {
+    const user = req.user as any;
+    return this.service.findByUtilisateurId(user.id);
+  }
+
+  // ✅ Modifier les infos du livreur connecté
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  async updateMyInfo(@Req() req: Request, @Body() dto: UpdateInfoLivreurDto) {
+    const user = req.user as any;
+    return this.service.updateByUtilisateurId(user.id, dto);
   }
 }

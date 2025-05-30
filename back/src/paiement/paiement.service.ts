@@ -7,7 +7,7 @@ import { UpdatePaiementDto } from './dto/update-paiement.dto';
 import { Response } from 'express';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 
 @Injectable()
 export class PaiementService {
@@ -17,8 +17,12 @@ export class PaiementService {
   ) {}
 
   findAll() {
-    return this.repo.find({ relations: ['utilisateur', 'annonce'] });
-  }
+      return this.repo.find({
+        relations: ['utilisateur', 'annonce'],
+        order: { date_paiement: 'DESC' },
+      });
+    
+      }
 
   findByUtilisateurId(utilisateurId: number) {
     return this.repo.find({
@@ -37,9 +41,11 @@ export class PaiementService {
       ...dto,
       utilisateur: { id: dto.utilisateurId },
       annonce: { id: dto.annonceId },
+      reference: 'PAY-' + Math.floor(Math.random() * 1000000), // génère une référence unique
     });
     return this.repo.save(paiement);
   }
+  
 
   async update(id: number, dto: UpdatePaiementDto) {
     await this.repo.update(id, dto);
@@ -56,9 +62,7 @@ export class PaiementService {
       relations: ['utilisateur', 'annonce'],
     });
   
-    if (!paiement) {
-      throw new Error('Paiement introuvable');
-    }
+    if (!paiement) throw new Error('Paiement introuvable');
   
     const doc = new PDFDocument();
     const fileName = `facture-${paiementId}.pdf`;
@@ -67,24 +71,21 @@ export class PaiementService {
   
     doc.pipe(stream);
   
-    // 🧾 Contenu de la facture
+    //  Contenu
     doc.fontSize(20).text('Facture', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(12).text(`Nom du client : ${paiement.utilisateur.nom}`);
-    doc.text(`Annonce : ${paiement.annonce.titre}`);
+    doc.fontSize(12).text(`Client : ${paiement.utilisateur.nom} ${paiement.utilisateur.prenom}`);
     doc.text(`Montant : ${paiement.montant} €`);
     doc.text(`Date : ${paiement.date_paiement.toLocaleDateString()}`);
+    doc.text(`Mode de paiement : ${paiement.moyen_paiement}`);
     doc.text(`Statut : ${paiement.statut}`);
-  
     doc.end();
   
     return new Promise((resolve, reject) => {
-      stream.on('finish', () => {
-        res.download(filePath);
-        resolve(null);
-      });
+      stream.on('finish', () => res.download(filePath));
       stream.on('error', reject);
     });
   }
+  
   
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import { type } from 'os';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
@@ -19,10 +20,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   //  Ce que tu retrouves dans req.user
   async validate(payload: any) {
-    return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-    };
+    const { sub, email, type } = payload
+    if (!type) {
+      console.warn(' JWT sans type !', payload)
+    }
+    return { id: sub, email, type }
   }
+  
+  
 }

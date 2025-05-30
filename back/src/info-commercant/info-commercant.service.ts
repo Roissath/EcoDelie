@@ -39,10 +39,18 @@ export class InfoCommercantService {
   }
 
   async rejeter(id: number) {
-    await this.repo.update(id, { verifie: false, status: 'refusé' });
+    await this.repo.update(id, { verifie: false, statut: 'refusé' });
   }
 
   remove(id: number) {
     return this.repo.delete(id);
   }
+
+  async findByUtilisateurId(utilisateurId: number) {
+    return this.repo.findOne({
+      where: { utilisateur: { id: utilisateurId } },
+      relations: ['utilisateur'],
+    });
+  }
+  
 }

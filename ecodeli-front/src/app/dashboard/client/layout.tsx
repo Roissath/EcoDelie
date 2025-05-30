@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import { ReactNode, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import SidebarClient from '@/components/SidebarClient'
-import { getUserFromCookie } from '@/lib/auth'
+import { getUserProfile } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
@@ -18,7 +18,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function checkAuth() {
-      const user = await getUserFromCookie()
+      const user = await getUserProfile()
       if (!user) {
         router.push('/login')
       } else {

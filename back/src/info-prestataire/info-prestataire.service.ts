@@ -40,7 +40,7 @@ export class InfoPrestataireService {
   }
 
   async rejeter(id: number) {
-    await this.repo.update(id, { verifie: false, status: 'refusé' });
+    await this.repo.update(id, { verifie: false, statut: 'refusé' });
   }
 
   remove(id: number) {

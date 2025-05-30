@@ -15,7 +15,7 @@ export class InfoCommercant {
   id!: number;
 
   @Column()
-  status!: string;
+  statut!: string;
 
   @Column()
   adresse!: string;

@@ -62,6 +62,10 @@ export class Utilisateur {
   @Column()
   login!: string;
 
+  @Column({ default: 'en_attente' }) // ou "en_cours"
+statut!: string; // 'en_attente' | 'valide' | 'rejete'
+
+
   @Column({ nullable: true })
   langue_utilise!: string;
 

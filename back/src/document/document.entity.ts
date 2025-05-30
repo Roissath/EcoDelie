@@ -14,7 +14,7 @@ import {
     id!: number;
   
     @Column()
-    type!: string;
+    type_document!: string;
   
     @Column()
     url!: string;

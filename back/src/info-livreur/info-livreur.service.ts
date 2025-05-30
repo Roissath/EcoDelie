@@ -44,4 +44,20 @@ export class InfoLivreurService {
   async rejeter(id: number) {
     await this.repo.update(id, { verifie: false, statut: 'rejeté' });
   }
+
+  findByUtilisateurId(utilisateurId: number) {
+    return this.repo.findOne({
+      where: { utilisateur: { id: utilisateurId } },
+      relations: ['utilisateur'],
+    });
+  }
+  
+  async updateByUtilisateurId(utilisateurId: number, dto: UpdateInfoLivreurDto) {
+    const livreur = await this.findByUtilisateurId(utilisateurId);
+    if (!livreur) throw new Error("Livreur non trouvé");
+  
+    await this.repo.update(livreur.id, dto);
+    return this.findByUtilisateurId(utilisateurId);
+  }
+  
 }

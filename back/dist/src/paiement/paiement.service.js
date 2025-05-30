@@ -26,7 +26,10 @@ let PaiementService = class PaiementService {
         this.repo = repo;
     }
     findAll() {
-        return this.repo.find({ relations: ['utilisateur', 'annonce'] });
+        return this.repo.find({
+            relations: ['utilisateur', 'annonce'],
+            order: { date_paiement: 'DESC' },
+        });
     }
     findByUtilisateurId(utilisateurId) {
         return this.repo.find({
@@ -42,6 +45,7 @@ let PaiementService = class PaiementService {
             ...dto,
             utilisateur: { id: dto.utilisateurId },
             annonce: { id: dto.annonceId },
+            reference: 'PAY-' + Math.floor(Math.random() * 1000000),
         });
         return this.repo.save(paiement);
     }
@@ -57,9 +61,8 @@ let PaiementService = class PaiementService {
             where: { id: paiementId },
             relations: ['utilisateur', 'annonce'],
         });
-        if (!paiement) {
+        if (!paiement)
             throw new Error('Paiement introuvable');
-        }
         const doc = new PDFDocument();
         const fileName = `facture-${paiementId}.pdf`;
         const filePath = (0, path_1.join)(__dirname, '..', '..', 'public', 'factures', fileName);
@@ -67,17 +70,14 @@ let PaiementService = class PaiementService {
         doc.pipe(stream);
         doc.fontSize(20).text('Facture', { align: 'center' });
         doc.moveDown();
-        doc.fontSize(12).text(`Nom du client : ${paiement.utilisateur.nom}`);
-        doc.text(`Annonce : ${paiement.annonce.titre}`);
+        doc.fontSize(12).text(`Client : ${paiement.utilisateur.nom} ${paiement.utilisateur.prenom}`);
         doc.text(`Montant : ${paiement.montant} €`);
         doc.text(`Date : ${paiement.date_paiement.toLocaleDateString()}`);
+        doc.text(`Mode de paiement : ${paiement.moyen_paiement}`);
         doc.text(`Statut : ${paiement.statut}`);
         doc.end();
         return new Promise((resolve, reject) => {
-            stream.on('finish', () => {
-                res.download(filePath);
-                resolve(null);
-            });
+            stream.on('finish', () => res.download(filePath));
             stream.on('error', reject);
         });
     }

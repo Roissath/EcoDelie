@@ -3,9 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
-  JoinColumn
+  JoinColumn,
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 import { Utilisateur } from '../utilisateur/utilisateur.entity';
+import { AnnonceClient } from '../annonce-client/annonce-client.entity';
+
+
 
 @Entity()
 export class InfoLivreur {
@@ -16,7 +21,7 @@ export class InfoLivreur {
   type_permis!: string;
 
   @Column()
-  zones_livraison!: string;
+  zones_livraison?: string;
 
   @Column()
   type_transport!: string;
@@ -24,7 +29,7 @@ export class InfoLivreur {
   @Column()
   moyen_paiement!: string;
 
-  @Column()
+  @Column({ default: 'en_attente'})
   statut!: string; // "en attente", "validé", "refusé"
 
   @Column({ nullable: true })
@@ -46,4 +51,12 @@ villes_livraison?: string;
   @OneToOne(() => Utilisateur, (utilisateur) => utilisateur.infoLivreur, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'Id_utilisateur' })
   utilisateur!: Utilisateur;
+
+  @ManyToMany(() => AnnonceClient, (annonce) => annonce.livreurs)
+annonces!: AnnonceClient[];
+
+  @ManyToMany(() => InfoLivreur, (livreur) => livreur.annonces)
+@JoinTable()
+livreurs!: InfoLivreur[];
+
 }

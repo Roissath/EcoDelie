@@ -12,8 +12,8 @@ import { Entrepot } from '../entrepot/entrepot.entity';
 import { Annonce } from '../annonce/annonce.entity';
 import { Utilisateur } from '../utilisateur/utilisateur.entity';
 import { Stokage } from '../stokage/stokage.entity';
-import { Commande } from 'src/commande/commande.entity';
-
+import { Commande } from '../commande/commande.entity';
+import { Livraison } from '../livraison/livraison.entity';
 
 @Entity()
 export class Colis {
@@ -64,5 +64,8 @@ export class Colis {
 
 @OneToOne(() => Commande, (commande) => commande.colis)
 commande!: Commande;
+
+
+
 
 }

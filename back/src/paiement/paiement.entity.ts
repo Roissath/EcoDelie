@@ -24,6 +24,9 @@ export class Paiement {
 
   @Column()
   statut!: string;
+  @Column()
+reference!: string;
+
 
   @ManyToOne(() => Utilisateur, (u) => u.paiements, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_utilisateur' })

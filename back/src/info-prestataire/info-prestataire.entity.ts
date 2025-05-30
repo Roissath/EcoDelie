@@ -23,10 +23,9 @@ export class InfoPrestataire {
 
   @Column({ nullable: true })
   contractId!: number;
+  @Column({ default: 'en_attente' })
+statut?: string;
 
-
-  @Column()
-  status!: string;
 
   @Column('float')
   tarif_prestation!: number;

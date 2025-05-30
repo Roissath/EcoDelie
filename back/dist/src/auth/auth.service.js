@@ -14,12 +14,31 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcrypt");
 const utilisateur_service_1 = require("../utilisateur/utilisateur.service");
+const role_enum_1 = require("../enums/role.enum");
+const admin_service_1 = require("../admin/admin.service");
+const info_client_service_1 = require("../info-client/info-client.service");
+const info_livreur_service_1 = require("../info-livreur/info-livreur.service");
+const info_commercant_service_1 = require("../info-commercant/info-commercant.service");
+const info_prestataire_service_1 = require("../info-prestataire/info-prestataire.service");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
     utilisateurService;
     jwtService;
-    constructor(utilisateurService, jwtService) {
+    adminService;
+    infoClientService;
+    infoLivreurService;
+    infoCommercantService;
+    infoPrestataireService;
+    mailService;
+    constructor(utilisateurService, jwtService, adminService, infoClientService, infoLivreurService, infoCommercantService, infoPrestataireService, mailService) {
         this.utilisateurService = utilisateurService;
         this.jwtService = jwtService;
+        this.adminService = adminService;
+        this.infoClientService = infoClientService;
+        this.infoLivreurService = infoLivreurService;
+        this.infoCommercantService = infoCommercantService;
+        this.infoPrestataireService = infoPrestataireService;
+        this.mailService = mailService;
     }
     async register(dto) {
         const existingUser = await this.utilisateurService.findByEmail(dto.email);
@@ -27,11 +46,15 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('Cet email est déjà utilisé');
         }
         const hashedPassword = await bcrypt.hash(dto.mot_de_passe, 10);
-        const user = await this.utilisateurService.create({
+        const parsedDto = {
             ...dto,
+            tarif_prestation: dto.tarif_prestation ? Number(dto.tarif_prestation) : undefined,
+            age: dto.age ? Number(dto.age) : undefined,
             type: dto.type,
             mot_de_passe: hashedPassword,
-        });
+        };
+        const user = await this.utilisateurService.create(parsedDto);
+        await this.mailService.sendWelcomeEmail(user.email, user.nom);
         return this.buildToken(user);
     }
     async login(dto) {
@@ -47,7 +70,7 @@ let AuthService = class AuthService {
         const payload = {
             sub: user.id,
             email: user.email,
-            role: user.type,
+            type: user.type,
         };
         const access_token = this.jwtService.sign(payload);
         return { access_token, user };
@@ -88,11 +111,47 @@ let AuthService = class AuthService {
         await this.utilisateurService.update(user.id, user);
         return { message: "Mot de passe mis à jour avec succès" };
     }
+    async getProfilSelonRole(utilisateur) {
+        const user = await this.utilisateurService.findOne(utilisateur.id);
+        if (!user) {
+            throw new common_1.UnauthorizedException('Utilisateur introuvable');
+        }
+        switch (user.type) {
+            case role_enum_1.Role.Admin: {
+                const profil = await this.adminService.findByUtilisateurId(user.id);
+                return profil ?? user;
+            }
+            case role_enum_1.Role.Client: {
+                const profil = await this.infoClientService.findByUtilisateurId(user.id);
+                return profil ?? user;
+            }
+            case role_enum_1.Role.Livreur: {
+                const profil = await this.infoLivreurService.findByUtilisateurId(user.id);
+                return profil ?? user;
+            }
+            case role_enum_1.Role.Commercant: {
+                const profil = await this.infoCommercantService.findByUtilisateurId(user.id);
+                return profil ?? user;
+            }
+            case role_enum_1.Role.Prestataire: {
+                const profil = await this.infoPrestataireService.findByUtilisateurId(user.id);
+                return profil ?? user;
+            }
+            default:
+                return user;
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [utilisateur_service_1.UtilisateurService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        admin_service_1.AdminService,
+        info_client_service_1.InfoClientService,
+        info_livreur_service_1.InfoLivreurService,
+        info_commercant_service_1.InfoCommercantService,
+        info_prestataire_service_1.InfoPrestataireService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

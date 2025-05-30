@@ -12,7 +12,6 @@ export class UtilisateurController {
     return this.service.create(dto);
   }
 
-
   @Get()
   findAll() {
     return this.service.findAll();
@@ -31,5 +30,15 @@ export class UtilisateurController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
+  }
+
+  @Patch(':id/valider-profil')
+  validerProfil(@Param('id') id: number) {
+    return this.service.update(id, { statut: 'valide' });
+  }
+
+  @Patch(':id/rejeter-profil')
+  rejeterProfil(@Param('id') id: number) {
+    return this.service.update(id, { statut: 'rejeté' });
   }
 }

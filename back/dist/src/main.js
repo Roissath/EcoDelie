@@ -5,7 +5,10 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const cookieParser = require("cookie-parser");
 const path_1 = require("path");
+const path_2 = require("path");
 const fs_1 = require("fs");
+const dotenv = require("dotenv");
+dotenv.config();
 async function bootstrap() {
     const facturesDir = (0, path_1.join)(__dirname, '..', 'public', 'factures');
     if (!(0, fs_1.existsSync)(facturesDir)) {
@@ -23,8 +26,8 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
-    app.useStaticAssets((0, path_1.join)(__dirname, '..', 'public'), {
-        prefix: '/',
+    app.useStaticAssets((0, path_2.resolve)('./uploads'), {
+        prefix: '/uploads',
     });
     await app.listen(3001);
     console.log('✅ Serveur NestJS démarré sur http://localhost:3001');

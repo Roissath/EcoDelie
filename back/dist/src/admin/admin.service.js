@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const admin_entity_1 = require("./admin.entity");
+const bcrypt = require("bcrypt");
 let AdminService = class AdminService {
     repo;
     constructor(repo) {
@@ -28,14 +29,23 @@ let AdminService = class AdminService {
     findOne(id) {
         return this.repo.findOne({ where: { id }, relations: ['utilisateur'] });
     }
-    create(dto) {
+    async findByUtilisateurId(utilisateurId) {
+        return this.repo.findOne({ where: { utilisateur: { id: utilisateurId } }, relations: ['utilisateur'] });
+    }
+    async create(dto) {
+        const hashedPassword = await bcrypt.hash(dto.mot_de_passe, 10);
         const admin = this.repo.create({
+            nom: dto.nom,
             statut: dto.statut,
+            mot_de_passe: hashedPassword,
             utilisateur: { id: dto.utilisateurId },
         });
         return this.repo.save(admin);
     }
     async update(id, dto) {
+        if (dto.mot_de_passe) {
+            dto.mot_de_passe = await bcrypt.hash(dto.mot_de_passe, 10);
+        }
         await this.repo.update(id, dto);
         return this.findOne(id);
     }
