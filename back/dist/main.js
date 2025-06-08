@@ -38,7 +38,6 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const cookieParser = __importStar(require("cookie-parser"));
 const path_1 = require("path");
-const path_2 = require("path");
 const fs_1 = require("fs");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
@@ -59,9 +58,8 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
-    app.useStaticAssets((0, path_2.resolve)('./uploads'), {
-        prefix: '/uploads',
-    });
+    app.useStaticAssets((0, path_1.join)(__dirname, '..', 'public'));
+    app.enableCors({ origin: true, credentials: true });
     await app.listen(3001);
     console.log('✅ Serveur NestJS démarré sur http://localhost:3001');
 }

@@ -78,6 +78,8 @@ resetToken?: string | null;
 
 @Column({ type: 'timestamp', nullable: true })
 resetTokenExpires?: Date | null;
+@Column({ nullable: true })
+photo_profil!: string;
 
 
 

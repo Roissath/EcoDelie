@@ -36,9 +36,11 @@ async function bootstrap() {
   );
 
   //  Sert les PDF via http://localhost:3001/factures/xxx.pdf
-app.useStaticAssets(resolve('./uploads'), {
-  prefix: '/uploads',
-});
+// app.useStaticAssets(resolve('./uploads'), {
+//   prefix: '/uploads',
+// });
+app.useStaticAssets(join(__dirname, '..', 'public'));
+app.enableCors({ origin: true, credentials: true });
 
   await app.listen(3001);
   console.log('✅ Serveur NestJS démarré sur http://localhost:3001');

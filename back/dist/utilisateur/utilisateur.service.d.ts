@@ -14,8 +14,8 @@ export declare class UtilisateurService {
     private readonly infoCommercantService;
     constructor(repo: Repository<Utilisateur>, infoClientService: InfoClientService, infoLivreurService: InfoLivreurService, infoPrestataireService: InfoPrestataireService, infoCommercantService: InfoCommercantService);
     findAll(): Promise<Utilisateur[]>;
-    findOne(id: number): Promise<Utilisateur | null>;
     findByEmail(email: string): Promise<Utilisateur | null>;
+    findOne(id: number): Promise<Utilisateur | null>;
     create(dto: CreateUtilisateurDto): Promise<Utilisateur>;
     update(id: number, dto: UpdateUtilisateurDto): Promise<Utilisateur | null>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;

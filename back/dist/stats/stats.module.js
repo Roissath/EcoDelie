@@ -21,6 +21,7 @@ const message_entity_1 = require("../message/message.entity");
 const notification_entity_1 = require("../notification/notification.entity");
 const document_entity_1 = require("../document/document.entity");
 const commande_entity_1 = require("../commande/commande.entity");
+const annonce_entity_1 = require("../annonce/annonce.entity");
 let StatsModule = class StatsModule {
 };
 exports.StatsModule = StatsModule;
@@ -30,6 +31,7 @@ exports.StatsModule = StatsModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([
                 utilisateur_entity_1.Utilisateur,
                 annonce_client_entity_1.AnnonceClient,
+                annonce_entity_1.Annonce,
                 produit_entity_1.Produit,
                 livraison_entity_1.Livraison,
                 colis_entity_1.Colis,

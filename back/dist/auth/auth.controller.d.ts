@@ -1,31 +1,59 @@
-import { Response, Request } from 'express';
-import { AuthService } from './auth.service';
-import { RegisterAuthDto } from './dto/register-auth.dto.ts';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { UtilisateurService } from '../utilisateur/utilisateur.service';
-import { MailService } from 'src/mail/mail.service';
+import type { AuthService } from "./auth.service";
+import type { LoginAuthDto } from "./dto/login-auth.dto";
+import type { RegisterAuthDto } from "./dto/register-auth.dto.ts";
 export declare class AuthController {
     private readonly authService;
-    private readonly utilisateurService;
-    private readonly mailService;
-    constructor(authService: AuthService, utilisateurService: UtilisateurService, mailService: MailService);
-    register(dto: RegisterAuthDto, res: Response): Promise<any>;
-    login(dto: LoginAuthDto, res: Response): Promise<{
-        message: string;
-        user: any;
+    constructor(authService: AuthService);
+    login(loginDto: LoginAuthDto): Promise<{
+        access_token: string;
+        user: {
+            id: number;
+            email: string;
+            nom: string;
+            prenom: string;
+            type: import("../enums/role.enum").Role;
+        };
     }>;
-    getMe(req: Request): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | import("../admin/admin.entity").Admin | import("../info-client/info-client.entity").InfoClient | import("../info-prestataire/info-prestataire.entity").InfoPrestataire | import("../info-livreur/info-livreur.entity").InfoLivreur | import("../info-commercant/info-commercant.entity").InfoCommercant>;
-    logout(res: Response): Promise<{
+    register(registerDto: RegisterAuthDto): Promise<{
+        message: string;
+        user: {
+            id: number;
+            email: string;
+            nom: string;
+            prenom: string;
+            type: import("../enums/role.enum").Role;
+        };
+    }>;
+    forgotPassword(body: {
+        email: string;
+    }): Promise<{
         message: string;
     }>;
-    changePassword(req: Request, body: {
-        oldPassword: string;
+    resetPassword(body: {
+        token: string;
         newPassword: string;
-    }): Promise<import("../utilisateur/utilisateur.entity").Utilisateur | null>;
-    forgotPassword(email: string): Promise<{
+    }): Promise<{
         message: string;
     }>;
-    resetPassword(token: string, password: string, confirmPassword: string): Promise<{
+    changePassword(req: any, body: {
+        currentPassword: string;
+        newPassword: string;
+    }): Promise<{
         message: string;
+    }>;
+    getProfile(req: any): Promise<{
+        id: number;
+        nom: string;
+        prenom: string;
+        email: string;
+        telephone: string;
+        adresse: string;
+        langue_utilise: string;
+        photo_profil: string;
+        type: import("../enums/role.enum").Role;
+        statut: string;
+        age: number;
+        datdenaissance: Date;
+        login: string;
     }>;
 }

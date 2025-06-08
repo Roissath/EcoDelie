@@ -36,6 +36,7 @@ export declare class Utilisateur {
     type: Role;
     resetToken?: string | null;
     resetTokenExpires?: Date | null;
+    photo_profil: string;
     infoClient: InfoClient;
     infoLivreur: InfoLivreur;
     infoPrestataire: InfoPrestataire;

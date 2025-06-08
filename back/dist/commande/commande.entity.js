@@ -20,6 +20,7 @@ let Commande = class Commande {
     id;
     statut;
     date_commande;
+    total;
     prix_unitaire;
     utilisateur;
     client;
@@ -41,6 +42,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)
 ], Commande.prototype, "date_commande", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'float', nullable: true }),
+    __metadata("design:type", Number)
+], Commande.prototype, "total", void 0);
 __decorate([
     (0, typeorm_1.Column)('float'),
     __metadata("design:type", Number)

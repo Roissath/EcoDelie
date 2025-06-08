@@ -26,13 +26,16 @@ export class UtilisateurService {
     return this.repo.find();
   }
 
-  findOne(id: number) {
-    return this.repo.findOne({ where: { id } });
-  }
 
   findByEmail(email: string) {
     return this.repo.findOne({ where: { email } });
   }
+findOne(id: number) {
+  return this.repo.findOne({
+    where: { id },
+    relations: ['infoClient', 'infoLivreur', 'infoPrestataire', 'infoCommercant'],
+  });
+}
 
 async create(dto: CreateUtilisateurDto) {
   const user = this.repo.create(dto);

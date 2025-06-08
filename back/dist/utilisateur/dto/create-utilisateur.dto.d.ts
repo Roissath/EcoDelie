@@ -12,6 +12,7 @@ export declare class CreateUtilisateurDto {
     langue_utilise?: string;
     type: Role;
     statut?: string;
+    photo_profil?: string;
     type_permis?: string;
     zones_livraison?: string;
     type_transport?: string;

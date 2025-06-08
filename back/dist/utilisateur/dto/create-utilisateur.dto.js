@@ -14,6 +14,7 @@ class CreateUtilisateurDto {
     langue_utilise;
     type;
     statut;
+    photo_profil;
     type_permis;
     zones_livraison;
     type_transport;

@@ -14,7 +14,7 @@ export class CreateUtilisateurDto {
   langue_utilise?: string;
   type!: Role;
   statut?: string;
-
+  photo_profil?: string; // URL de la photo
   // Champs InfoLivreur
   type_permis?: string;
   zones_livraison?: string;

@@ -7,6 +7,7 @@ export declare class Commande {
     id: number;
     statut: string;
     date_commande: Date;
+    total: number;
     prix_unitaire: number;
     utilisateur: Utilisateur;
     client: Utilisateur;

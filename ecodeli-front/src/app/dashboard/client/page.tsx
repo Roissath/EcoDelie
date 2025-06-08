@@ -1,7 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingCart, Briefcase, PackageCheck, Truck, CreditCard, User, Plus, Bell } from "lucide-react"
+import {
+  ShoppingCart,
+  Briefcase,
+  PackageCheck,
+  Truck,
+  CreditCard,
+  User,
+  Plus,
+  Bell,
+  Package,
+  MessageCircle,
+  ShoppingBag,
+} from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface DashboardStats {
@@ -38,8 +50,8 @@ export default function DashboardClient() {
         setLoading(true)
         setError(null)
 
-        // Appel API pour récupérer les statistiques du dashboard
-        const response = await fetch("http://localhost:3001/dashboard/client/stats", {
+        // Récupérer d'abord les infos utilisateur
+        const userResponse = await fetch("http://localhost:3001/auth/me", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -47,12 +59,35 @@ export default function DashboardClient() {
           },
         })
 
-        if (!response.ok) {
-          throw new Error(`Erreur ${response.status}: ${response.statusText}`)
+        if (!userResponse.ok) {
+          throw new Error("Non authentifié")
         }
 
-        const data = await response.json()
-        setStats(data)
+        const userData = await userResponse.json()
+
+        // Ensuite récupérer les statistiques du dashboard
+        const statsResponse = await fetch(`http://localhost:3001/stats/dashboard/client/${userData.id}`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json()
+          setStats(statsData)
+        } else {
+          // Si l'endpoint n'existe pas encore, utiliser des données par défaut
+          console.log("Endpoint stats non disponible, utilisation de données par défaut")
+          setStats({
+            annoncesActives: 0,
+            commandesEnCours: 0,
+            livraisonsEnAttente: 0,
+            totalDepense: 0,
+            recentActivities: [],
+          })
+        }
       } catch (error) {
         console.error("Erreur lors du chargement des données du dashboard:", error)
         setError("Impossible de charger les données du dashboard")
@@ -142,7 +177,7 @@ export default function DashboardClient() {
         </div>
       </section>
 
-      {/* Contenu principal - tes cartes de navigation */}
+      {/* Contenu principal */}
       <main className="flex-1 max-w-6xl mx-auto py-16 px-6">
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-2xl font-bold text-gray-800">Que souhaitez-vous faire ?</h2>
@@ -154,7 +189,7 @@ export default function DashboardClient() {
           </Link>
         </div>
 
-        {/* Cartes de navigation - ton design original */}
+        {/* Cartes de navigation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Explorer Produits */}
           <Link
@@ -182,8 +217,8 @@ export default function DashboardClient() {
                 <Briefcase className="text-blue-600 w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Explorer Prestations</h2>
-                <p className="text-gray-600 text-sm">Voir les services disponibles</p>
+                <h2 className="text-xl font-bold text-gray-800">Services à la personne</h2>
+                <p className="text-gray-600 text-sm">Réserver des prestations</p>
               </div>
             </div>
           </Link>
@@ -220,6 +255,38 @@ export default function DashboardClient() {
             </div>
           </Link>
 
+          {/* Stockage & Box */}
+          <Link
+            href="/dashboard/client/stockage"
+            className="bg-white p-6 rounded-2xl shadow hover:shadow-lg border hover:-translate-y-1 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-100 rounded-full group-hover:bg-indigo-200 transition">
+                <Package className="text-indigo-600 w-8 h-8" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Stockage & Box</h2>
+                <p className="text-gray-600 text-sm">Gérer mes espaces de stockage</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Chat & Messages */}
+          <Link
+            href="/dashboard/client/chat"
+            className="bg-white p-6 rounded-2xl shadow hover:shadow-lg border hover:-translate-y-1 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-pink-100 rounded-full group-hover:bg-pink-200 transition">
+                <MessageCircle className="text-pink-600 w-8 h-8" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+                <p className="text-gray-600 text-sm">Communiquer avec les prestataires</p>
+              </div>
+            </div>
+          </Link>
+
           {/* Paiements */}
           <Link
             href="/dashboard/client/paiements"
@@ -232,6 +299,22 @@ export default function DashboardClient() {
               <div>
                 <h2 className="text-xl font-bold text-gray-800">Paiements & Factures</h2>
                 <p className="text-gray-600 text-sm">Voir mes paiements et factures</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Panier */}
+          <Link
+            href="/dashboard/client/panier"
+            className="bg-white p-6 rounded-2xl shadow hover:shadow-lg border hover:-translate-y-1 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-yellow-100 rounded-full group-hover:bg-yellow-200 transition">
+                <ShoppingBag className="text-yellow-600 w-8 h-8" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Mon Panier</h2>
+                <p className="text-gray-600 text-sm">Finaliser mes achats</p>
               </div>
             </div>
           </Link>

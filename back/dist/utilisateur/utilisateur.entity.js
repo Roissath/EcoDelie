@@ -49,6 +49,7 @@ let Utilisateur = class Utilisateur {
     type;
     resetToken;
     resetTokenExpires;
+    photo_profil;
     infoClient;
     infoLivreur;
     infoPrestataire;
@@ -135,6 +136,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
     __metadata("design:type", Object)
 ], Utilisateur.prototype, "resetTokenExpires", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Utilisateur.prototype, "photo_profil", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => info_client_entity_1.InfoClient, (c) => c.utilisateur, { cascade: true }),
     __metadata("design:type", info_client_entity_1.InfoClient)

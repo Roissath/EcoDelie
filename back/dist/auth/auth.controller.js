@@ -14,109 +14,62 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
-const register_auth_dto_ts_1 = require("./dto/register-auth.dto.ts");
-const login_auth_dto_1 = require("./dto/login-auth.dto");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
-const utilisateur_service_1 = require("../utilisateur/utilisateur.service");
-const crypto_1 = require("crypto");
-const common_2 = require("@nestjs/common");
-const mail_service_1 = require("../mail/mail.service");
 let AuthController = class AuthController {
     authService;
-    utilisateurService;
-    mailService;
-    constructor(authService, utilisateurService, mailService) {
+    constructor(authService) {
         this.authService = authService;
-        this.utilisateurService = utilisateurService;
-        this.mailService = mailService;
     }
-    async register(dto, res) {
-        const { access_token, user } = await this.authService.register(dto);
-        res.cookie('jwt', access_token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-        return user;
+    async login(loginDto) {
+        return this.authService.login(loginDto);
     }
-    async login(dto, res) {
-        const { access_token, user } = await this.authService.login(dto);
-        res.cookie('jwt', access_token, {
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: false,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-        return {
-            message: 'Connexion réussie',
-            user,
-        };
+    async register(registerDto) {
+        return this.authService.register(registerDto);
     }
-    async getMe(req) {
-        console.log("USER JWT PAYLOAD :", req['user']);
-        const utilisateur = req['user'];
-        return this.authService.getProfilSelonRole(utilisateur);
+    async forgotPassword(body) {
+        return this.authService.forgotPassword(body.email);
     }
-    async logout(res) {
-        res.clearCookie('jwt');
-        return { message: 'Déconnecté avec succès' };
+    async resetPassword(body) {
+        return this.authService.resetPassword(body.token, body.newPassword);
     }
     async changePassword(req, body) {
-        return this.authService.changePassword(req.user, body.oldPassword, body.newPassword);
+        return this.authService.changePassword(req.user.id, body.currentPassword, body.newPassword);
     }
-    async forgotPassword(email) {
-        const user = await this.utilisateurService.findByEmail(email);
-        if (!user)
-            return { message: 'Si cet email existe, un lien a été envoyé.' };
-        const token = (0, crypto_1.randomUUID)();
-        const expires = new Date(Date.now() + 1000 * 60 * 60);
-        user.resetToken = token;
-        user.resetTokenExpires = expires;
-        await this.utilisateurService.update(user.id, user);
-        const resetLink = `http://localhost:3000/reset-password/${token}`;
-        await this.mailService.sendPasswordResetEmail(user.email, token);
-        return { message: 'Si cet email existe, un lien a été envoyé.' };
-    }
-    async resetPassword(token, password, confirmPassword) {
-        return this.authService.resetPassword(token, password, confirmPassword);
+    async getProfile(req) {
+        return this.authService.getProfile(req.user.id);
     }
 };
 exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Post)('register'),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [register_auth_dto_ts_1.RegisterAuthDto, Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "register", null);
-__decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [login_auth_dto_1.LoginAuthDto, Object]),
+    __metadata("design:paramtypes", [Function]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.Get)('me'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, common_1.Req)()),
+    (0, common_1.Post)('register'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Function]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "getMe", null);
+], AuthController.prototype, "forgotPassword", null);
 __decorate([
-    (0, common_1.Post)('logout'),
-    __param(0, (0, common_1.Res)({ passthrough: true })),
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "logout", null);
+], AuthController.prototype, "resetPassword", null);
 __decorate([
-    (0, common_1.Patch)('change-password'),
+    (0, common_1.Post)("change-password"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -125,25 +78,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "changePassword", null);
 __decorate([
-    (0, common_1.Post)('forgot-password'),
-    __param(0, (0, common_1.Body)('email')),
+    (0, common_1.Get)('me'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "forgotPassword", null);
-__decorate([
-    (0, common_1.Post)('reset-password/:token'),
-    __param(0, (0, common_2.Param)('token')),
-    __param(1, (0, common_1.Body)('password')),
-    __param(2, (0, common_1.Body)('confirmPassword')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "resetPassword", null);
+], AuthController.prototype, "getProfile", null);
 exports.AuthController = AuthController = __decorate([
-    (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService,
-        utilisateur_service_1.UtilisateurService,
-        mail_service_1.MailService])
+    (0, common_1.Controller)("auth"),
+    __metadata("design:paramtypes", [Function])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

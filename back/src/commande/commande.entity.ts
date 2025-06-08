@@ -24,6 +24,9 @@ export class Commande {
   @Column()
   date_commande!: Date;
   
+  @Column({ type: 'float', nullable: true })
+total!: number;
+
 
   @Column('float')
   prix_unitaire!: number;

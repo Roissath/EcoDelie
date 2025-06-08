@@ -11,7 +11,7 @@ import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { StatsModule } from './stats/stats.module'
+import { StatsModule } from './utilisateur/stats/stats.module';
 
 import { UtilisateurModule } from './utilisateur/utilisateur.module';
 import { InfoClientModule } from './info-client/info-client.module';

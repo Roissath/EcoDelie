@@ -38,11 +38,14 @@ let UtilisateurService = class UtilisateurService {
     findAll() {
         return this.repo.find();
     }
-    findOne(id) {
-        return this.repo.findOne({ where: { id } });
-    }
     findByEmail(email) {
         return this.repo.findOne({ where: { email } });
+    }
+    findOne(id) {
+        return this.repo.findOne({
+            where: { id },
+            relations: ['infoClient', 'infoLivreur', 'infoPrestataire', 'infoCommercant'],
+        });
     }
     async create(dto) {
         const user = this.repo.create(dto);

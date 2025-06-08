@@ -1,42 +1,55 @@
-import { JwtService } from '@nestjs/jwt';
-import { UtilisateurService } from '../utilisateur/utilisateur.service';
-import { RegisterAuthDto } from './dto/register-auth.dto.ts';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { AdminService } from 'src/admin/admin.service';
-import { InfoClientService } from 'src/info-client/info-client.service';
-import { InfoLivreurService } from 'src/info-livreur/info-livreur.service';
-import { InfoCommercantService } from 'src/info-commercant/info-commercant.service';
-import { InfoPrestataireService } from 'src/info-prestataire/info-prestataire.service';
-import { Utilisateur } from 'src/utilisateur/utilisateur.entity';
-import { MailService } from 'src/mail/mail.service';
+import type { JwtService } from "@nestjs/jwt";
+import type { UtilisateurService } from "../utilisateur/utilisateur.service";
+import type { LoginAuthDto } from "./dto/login-auth.dto";
+import type { RegisterAuthDto } from "./dto/register-auth.dto.ts";
+import type { MailService } from "../mail/mail.service";
 export declare class AuthService {
     private readonly utilisateurService;
     private readonly jwtService;
-    private readonly adminService;
-    private readonly infoClientService;
-    private readonly infoLivreurService;
-    private readonly infoCommercantService;
-    private readonly infoPrestataireService;
     private readonly mailService;
-    constructor(utilisateurService: UtilisateurService, jwtService: JwtService, adminService: AdminService, infoClientService: InfoClientService, infoLivreurService: InfoLivreurService, infoCommercantService: InfoCommercantService, infoPrestataireService: InfoPrestataireService, mailService: MailService);
-    register(dto: RegisterAuthDto): Promise<{
+    constructor(utilisateurService: UtilisateurService, jwtService: JwtService, mailService: MailService);
+    login(loginDto: LoginAuthDto): Promise<{
         access_token: string;
-        user: any;
+        user: {
+            id: number;
+            email: string;
+            nom: string;
+            prenom: string;
+            type: import("../enums/role.enum").Role;
+        };
     }>;
-    login(dto: LoginAuthDto): Promise<{
-        access_token: string;
-        user: any;
+    register(registerDto: RegisterAuthDto): Promise<{
+        message: string;
+        user: {
+            id: number;
+            email: string;
+            nom: string;
+            prenom: string;
+            type: import("../enums/role.enum").Role;
+        };
     }>;
-    buildToken(user: any): Promise<{
-        access_token: string;
-        user: any;
+    getProfile(userId: number): Promise<{
+        id: number;
+        nom: string;
+        prenom: string;
+        email: string;
+        telephone: string;
+        adresse: string;
+        langue_utilise: string;
+        photo_profil: string;
+        type: import("../enums/role.enum").Role;
+        statut: string;
+        age: number;
+        datdenaissance: Date;
+        login: string;
     }>;
-    me(payload: any): Promise<Utilisateur | null>;
-    getMe(id: number): Promise<Utilisateur | null>;
-    changePassword(userPayload: any, oldPassword: string, newPassword: string): Promise<Utilisateur | null>;
-    findByEmail(email: string): Promise<Utilisateur | null>;
-    resetPassword(token: string, password: string, confirmPassword: string): Promise<{
+    changePassword(userId: number, currentPassword: string, newPassword: string): Promise<{
         message: string;
     }>;
-    getProfilSelonRole(utilisateur: Utilisateur): Promise<Utilisateur | import("../admin/admin.entity").Admin | import("../info-client/info-client.entity").InfoClient | import("../info-prestataire/info-prestataire.entity").InfoPrestataire | import("../info-livreur/info-livreur.entity").InfoLivreur | import("../info-commercant/info-commercant.entity").InfoCommercant>;
+    forgotPassword(email: string): Promise<{
+        message: string;
+    }>;
+    resetPassword(token: string, newPassword: string): Promise<{
+        message: string;
+    }>;
 }
